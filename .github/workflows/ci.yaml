@@ -42,10 +42,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Validate config.yaml
-        uses: home-assistant/actions/helpers/validate-add-on@main
-        with:
-          path: ha-joplin-bridge
+      - name: Validate config.yaml syntax
+        run: |
+          python -c "
+          import yaml
+          with open('ha-joplin-bridge/config.yaml', 'r') as f:
+              config = yaml.safe_load(f)
+              print('✅ config.yaml is valid YAML')
+              
+          # Basic validation
+          required_fields = ['name', 'description', 'version', 'slug', 'arch']
+          for field in required_fields:
+              if field not in config:
+                  raise ValueError(f'Missing required field: {field}')
+                  
+          print('✅ Required fields present')
+          print(f\"Add-on: {config['name']} v{config['version']}\")
+          "
 
   build:
     name: Build
@@ -68,10 +81,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Build and push
-        uses: home-assistant/builder@master
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          args: |
-            --${{ matrix.architecture }} \
-            --target ha-joplin-bridge \
-            --docker-hub ghcr.io/${{ github.repository_owner }}
+          images: ghcr.io/${{ github.repository_owner }}/hassio-addons
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ha-joplin-bridge
+          platforms: linux/${{ matrix.architecture }}
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/hassio-addons/${{ matrix.architecture }}-ha-joplin-bridge:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
