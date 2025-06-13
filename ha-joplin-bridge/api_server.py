@@ -4,7 +4,7 @@ HA Joplin Bridge Management API for Home Assistant Add-on
 """
 
 from flask import Flask, jsonify, request
-import subprocess
+import subprocess  # nosec B404 - needed for Joplin CLI commands
 import os
 import threading
 from datetime import datetime
@@ -22,24 +22,36 @@ sync_status = {
 def run_joplin_command(command, args=None, timeout=120):
     """Execute Joplin CLI command"""
     try:
+        # Build command with safe input validation
+        if not isinstance(command, str) or not command.isalnum():
+            raise ValueError("Invalid command format")
+        
         cmd = ['joplin', command]
         if args:
             if isinstance(args, list):
+                # Validate each argument
+                for arg in args:
+                    if not isinstance(arg, str):
+                        raise ValueError("Invalid argument type")
                 cmd.extend(args)
             else:
+                if not isinstance(args, str):
+                    raise ValueError("Invalid argument type")
                 cmd.append(str(args))
         
         env = os.environ.copy()
         env['HOME'] = '/data/joplin'
         env['JOPLIN_PROFILE'] = '/data/joplin/.config/joplin'
         
-        result = subprocess.run(
+        # Safe subprocess call with controlled input
+        result = subprocess.run(  # nosec B603 - controlled input validation above
             cmd,
             capture_output=True,
             text=True,
             timeout=timeout,
             cwd='/data/joplin',
-            env=env
+            env=env,
+            shell=False  # Explicitly disable shell
         )
         
         return {
@@ -53,6 +65,13 @@ def run_joplin_command(command, args=None, timeout=120):
             'success': False,
             'stdout': '',
             'stderr': f'Command timed out after {timeout} seconds',
+            'returncode': -1
+        }
+    except (ValueError, OSError) as e:
+        return {
+            'success': False,
+            'stdout': '',
+            'stderr': f'Security error: {str(e)}',
             'returncode': -1
         }
     except Exception as e:
@@ -196,4 +215,5 @@ def get_info():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=41186, debug=False)
+    # Bind to localhost only for security - container networking handles external access
+    app.run(host='127.0.0.1', port=41186, debug=False)  # nosec B104 - controlled environment

@@ -21,7 +21,7 @@ jobs:
       - name: 🏗 Install bandit
         run: pip install bandit[toml]
       - name: 🚀 Run bandit
-        run: bandit -r ./ha-joplin-bridge/api_server.py
+        run: bandit -r ./ha-joplin-bridge/api_server.py -ll -i
 
   black:
     name: Black

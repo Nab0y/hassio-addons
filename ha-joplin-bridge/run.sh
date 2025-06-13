@@ -113,9 +113,15 @@ echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting management API server..."
 # Start API server in background
 nohup python3 /api_server.py > /data/joplin/api.log 2>&1 &
 
-echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting port forwarder..."
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting port forwarders..."
 '
 
-# Start socat proxy for port forwarding
-log "Starting socat proxy on port 41185..."
-socat TCP-LISTEN:41185,fork,bind=0.0.0.0 TCP:127.0.0.1:41184
+# Start socat proxies for port forwarding
+log "Starting socat proxies..."
+# Joplin Data API proxy
+socat TCP-LISTEN:41185,fork,bind=0.0.0.0 TCP:127.0.0.1:41184 &
+# Management API proxy  
+socat TCP-LISTEN:41186,fork,bind=0.0.0.0 TCP:127.0.0.1:41186 &
+
+# Wait for any background process to exit
+wait
