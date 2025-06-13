@@ -139,8 +139,6 @@ def get_token():
 @app.route("/sync", methods=["POST"])
 def sync_notes():
     """Start note synchronization"""
-    global sync_status
-
     data = request.get_json() if request.is_json else {}
     background = data.get("background", True)
 
@@ -169,6 +167,7 @@ def sync_notes():
             }
         )
     else:
+        global sync_status
         result = run_joplin_command("sync", timeout=300)
         sync_status["last_sync"] = datetime.now().isoformat()
         sync_status["output"] = result["stdout"]
