@@ -76,7 +76,6 @@ def run_joplin_command(command, args=None, timeout=120):
 
 def background_sync():
     """Background synchronization"""
-    global sync_status
     try:
         sync_status["running"] = True
         sync_status["error"] = None
@@ -167,7 +166,6 @@ def sync_notes():
             }
         )
     else:
-        global sync_status
         result = run_joplin_command("sync", timeout=300)
         sync_status["last_sync"] = datetime.now().isoformat()
         sync_status["output"] = result["stdout"]
