@@ -1,9 +1,4 @@
-name: "HA Joplin Bridge Add-ons"
-description: "Home Assistant add-ons for Joplin integration"
+name: "Nab0y's Home Assistant Add-ons"
+description: "Home Assistant add-ons"
 url: "https://github.com/Nab0y/hassio-addons"
-maintainer: "Nab0y <naboy7@yandex.ru>"
-addons:
-  ha-joplin-bridge:
-    name: "HA Joplin Bridge"
-    description: "Bridge between Home Assistant and Joplin with Web Clipper API support"
-    url: "https://github.com/Nab0y/hassio-addons/tree/main/ha-joplin-bridge"
+maintainer: "Nab0y"
