@@ -1,0 +1,62 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  bandit:
+    name: Bandit
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4
+      - name: 🏗 Set up Python
+        id: python
+        uses: actions/setup-python@v4.7.1
+        with:
+          python-version: "3.11"
+      - name: 🏗 Install bandit
+        run: pip install bandit[toml]
+      - name: 🚀 Run bandit
+        run: bandit -r ./ha-joplin-bridge/api_server.py
+
+  black:
+    name: Black
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4
+      - name: 🏗 Set up Python
+        id: python
+        uses: actions/setup-python@v4.7.1
+        with:
+          python-version: "3.11"
+      - name: 🏗 Install Black
+        run: pip install black
+      - name: 🚀 Run Black
+        run: black --check --diff ./ha-joplin-bridge/api_server.py
+
+  hadolint:
+    name: Hadolint
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4
+      - name: 🚀 Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ./ha-joplin-bridge/Dockerfile
+
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4
+      - name: 🚀 Run Shellcheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: "./ha-joplin-bridge"

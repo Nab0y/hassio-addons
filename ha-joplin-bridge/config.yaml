@@ -1,0 +1,48 @@
+name: "HA Joplin Bridge"
+description: "Bridge between Home Assistant and Joplin with Web Clipper API support"
+version: "1.0.0"
+slug: ha-joplin-bridge
+url: "https://github.com/Nab0y/hassio-addons/tree/main/ha-joplin-bridge"
+arch:
+  - aarch64
+  - amd64
+startup: services
+boot: auto
+init: false
+hassio_api: true
+hassio_role: default
+homeassistant_api: false
+host_network: false
+map:
+  - share:rw
+ports:
+  41184/tcp: 41184
+  41185/tcp: 41185
+  41186/tcp: 41186
+ports_description:
+  41184/tcp: "Joplin Data API (direct)"
+  41185/tcp: "Joplin Data API (proxied)"
+  41186/tcp: "Management API"
+options:
+  sync_target: 0
+  sync_interval: 300
+  locale: "en_GB"
+  timezone: "UTC"
+  enable_encryption: false
+  encryption_password: ""
+  sync_config:
+    server_url: "https://yourserver.com"
+    username: ""
+    password: ""
+schema:
+  sync_target: list(0|2|3|5|7|8|9|10)
+  sync_interval: int(60,3600)
+  locale: str
+  timezone: str
+  enable_encryption: bool
+  encryption_password: password?
+  sync_config:
+    server_url: url?
+    username: str?
+    password: password?
+image: "ghcr.io/home-assistant/{arch}-addon-base"
