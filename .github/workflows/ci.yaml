@@ -92,5 +92,7 @@ jobs:
           platforms: linux/${{ matrix.architecture }}
           push: true
           tags: ghcr.io/${{ steps.repo.outputs.owner }}/hassio-addons/${{ matrix.architecture }}-ha-joplin-bridge:latest
+          build-args: |
+            TARGETARCH=${{ matrix.architecture }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

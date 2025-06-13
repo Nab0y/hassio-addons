@@ -1,5 +1,5 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+ARG TARGETARCH
+FROM ghcr.io/home-assistant/${TARGETARCH}-base:latest
 
 # Install dependencies
 RUN apk add --no-cache \
