@@ -1,3 +1,4 @@
 name: HA Joplin Bridge Add-ons
+description: "Home Assistant add-ons for Joplin integration"
 url: https://github.com/Nab0y/hassio-addons
 maintainer: Nab0y <naboy7@yandex.ru>

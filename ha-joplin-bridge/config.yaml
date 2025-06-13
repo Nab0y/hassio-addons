@@ -45,4 +45,4 @@ schema:
     server_url: url?
     username: str?
     password: password?
-image: "ghcr.io/home-assistant/{arch}-addon-base"
+image: "ghcr.io/nab0y/hassio-addons/{arch}-ha-joplin-bridge"
