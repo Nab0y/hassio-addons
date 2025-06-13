@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   lint:
     name: Lint
@@ -91,7 +95,7 @@ jobs:
           context: ./ha-joplin-bridge
           platforms: linux/${{ matrix.architecture }}
           push: true
-          tags: ghcr.io/${{ steps.repo.outputs.owner }}/hassio-addons/${{ matrix.architecture }}-ha-joplin-bridge:latest
+          tags: ghcr.io/${{ steps.repo.outputs.owner }}/ha-joplin-bridge:${{ matrix.architecture }}-latest
           build-args: |
             TARGETARCH=${{ matrix.architecture }}
           cache-from: type=gha
