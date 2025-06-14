@@ -103,7 +103,7 @@ def health_check():
             "status": "healthy",
             "joplin_api_available": True,
             "sync_running": sync_status["running"],
-            "addon_version": "1.0.0",
+            "addon_version": "1.0.2",
         }
     )
 
@@ -121,7 +121,7 @@ def get_token():
                 {
                     "success": True,
                     "token": token,
-                    "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41184',
+                    "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
                 }
             )
         else:
@@ -203,7 +203,7 @@ def get_info():
     return jsonify(
         {
             "success": True,
-            "addon_version": "1.0.0",
+            "addon_version": "1.0.2",
             "joplin_version": "CLI",
             "status": (
                 status_result["stdout"] if status_result["success"] else "Unknown"
@@ -217,7 +217,7 @@ def get_info():
                 "sync": "/sync (POST)",
                 "sync_status": "/sync/status",
             },
-            "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41184',
+            "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
         }
     )
 

@@ -77,13 +77,18 @@ if [ '"$SYNC_TARGET"' -ne 0 ] && [ "'"$SYNC_SERVER_URL"'" != "null" ] && [ -n "'
 fi
 '
 
-log "Starting Joplin server..."
-# Start Joplin server as joplin user
-su joplin -c 'export HOME=/data/joplin; cd /data/joplin; joplin server start --port 41184' &
+log "Starting Joplin server on localhost..."
+# Start Joplin server as joplin user (only on localhost for security)
+su joplin -c 'export HOME=/data/joplin; cd /data/joplin; joplin server start --port 41184 --host 127.0.0.1' &
 JOPLIN_PID=$!
 
 # Wait for Joplin to start
 sleep 10
+
+log "Starting socat proxy for Joplin API..."
+# Start socat proxy to forward external requests to localhost Joplin
+socat TCP-LISTEN:41185,fork,bind=0.0.0.0,reuseaddr TCP:127.0.0.1:41184 &
+SOCAT_PID=$!
 
 log "Starting management API server..."
 # Start API server as root (needs access to ports)
@@ -91,12 +96,13 @@ python3 /api_server.py &
 API_PID=$!
 
 log "All services started successfully"
-log "Joplin PID: $JOPLIN_PID, API PID: $API_PID"
+log "Joplin PID: $JOPLIN_PID, Socat PID: $SOCAT_PID, API PID: $API_PID"
 
 # Cleanup function
 cleanup() {
     log "Shutting down services..."
     kill $API_PID 2>/dev/null || true
+    kill $SOCAT_PID 2>/dev/null || true
     kill $JOPLIN_PID 2>/dev/null || true
     wait
     log "Shutdown complete"
@@ -111,6 +117,11 @@ while true; do
     if ! kill -0 $JOPLIN_PID 2>/dev/null; then
         log "ERROR: Joplin server stopped!"
         break
+    fi
+    if ! kill -0 $SOCAT_PID 2>/dev/null; then
+        log "WARNING: Socat proxy stopped, restarting..."
+        socat TCP-LISTEN:41185,fork,bind=0.0.0.0,reuseaddr TCP:127.0.0.1:41184 &
+        SOCAT_PID=$!
     fi
     if ! kill -0 $API_PID 2>/dev/null; then
         log "ERROR: API server stopped!"

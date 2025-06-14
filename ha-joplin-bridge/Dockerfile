@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     curl \
     jq \
     tzdata \
+    socat \
     python3 \
     py3-flask
 
@@ -31,7 +32,7 @@ RUN chmod +x /run.sh
 WORKDIR /data/joplin
 
 # Export ports
-EXPOSE 41184 41186
+EXPOSE 41185 41186
 
 # Start
 CMD ["/run.sh"]

@@ -1,6 +1,6 @@
 name: "HA Joplin Bridge"
 description: "Bridge between Home Assistant and Joplin with Web Clipper API support"
-version: "1.0.1"
+version: "1.0.2"
 slug: ha-joplin-bridge
 url: "https://github.com/Nab0y/hassio-addons/tree/main/ha-joplin-bridge"
 arch:
@@ -16,10 +16,10 @@ host_network: false
 map:
   - share:rw
 ports:
-  41184/tcp: 41184
+  41185/tcp: 41185  
   41186/tcp: 41186
 ports_description:
-  41184/tcp: "Joplin Data API"
+  41185/tcp: "Joplin Data API (Web Clipper)"
   41186/tcp: "Management API"
 options:
   sync_target: 0
