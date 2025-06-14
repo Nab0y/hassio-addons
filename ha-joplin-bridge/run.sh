@@ -6,6 +6,17 @@ log() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
 }
 
+# Cleanup function
+cleanup() {
+    log "Shutting down..."
+    pkill -f python3 || true
+    pkill -f joplin || true
+    exit 0
+}
+
+# Set trap for cleanup
+trap cleanup SIGTERM SIGINT
+
 # Get configuration from Home Assistant
 SYNC_TARGET=$(bashio::config 'sync_target')
 SYNC_INTERVAL=$(bashio::config 'sync_interval')
@@ -44,7 +55,7 @@ ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 mkdir -p /data/joplin/.config/joplin
 chown -R joplin:joplin /data/joplin
 
-# Switch to joplin user
+# Switch to joplin user and configure
 su joplin -c '
 export HOME=/data/joplin
 cd /data/joplin
@@ -102,26 +113,37 @@ if [ '$SYNC_TARGET' -ne 0 ]; then
     joplin sync || echo "Initial sync failed, continuing..."
 fi
 
-echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting Joplin server..."
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting Joplin server on port 41184..."
 # Start Joplin server in background
-nohup joplin server start > /data/joplin/joplin.log 2>&1 &
+nohup joplin server start --port 41184 > /data/joplin/joplin.log 2>&1 &
 
 # Wait for Joplin to start
-sleep 5
+sleep 10
 
-echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting management API server..."
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting management API server on port 41186..."
 # Start API server in background
 nohup python3 /api_server.py > /data/joplin/api.log 2>&1 &
 
-echo "[$(date +"%Y-%m-%d %H:%M:%S")] Starting port forwarders..."
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] All services started successfully"
 '
 
-# Start socat proxies for port forwarding
-log "Starting socat proxies..."
-# Joplin Data API proxy
-socat TCP-LISTEN:41185,fork,bind=0.0.0.0 TCP:127.0.0.1:41184 &
-# Management API proxy  
-socat TCP-LISTEN:41186,fork,bind=0.0.0.0 TCP:127.0.0.1:41186 &
+log "Services started. Waiting for processes..."
 
-# Wait for any background process to exit
-wait
+# Simple monitoring loop without socat
+while true; do
+    # Check if Joplin server is running
+    if ! pgrep -f "joplin server" > /dev/null; then
+        log "ERROR: Joplin server stopped!"
+        break
+    fi
+    
+    # Check if API server is running  
+    if ! pgrep -f "api_server.py" > /dev/null; then
+        log "ERROR: API server stopped!"
+        break
+    fi
+    
+    sleep 30
+done
+
+log "One or more services stopped. Exiting..."

@@ -121,7 +121,7 @@ def get_token():
                 {
                     "success": True,
                     "token": token,
-                    "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
+                    "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41184',
                 }
             )
         else:
@@ -217,7 +217,7 @@ def get_info():
                 "sync": "/sync (POST)",
                 "sync_status": "/sync/status",
             },
-            "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
+            "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41184',
         }
     )
 

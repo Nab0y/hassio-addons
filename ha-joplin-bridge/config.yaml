@@ -17,11 +17,9 @@ map:
   - share:rw
 ports:
   41184/tcp: 41184
-  41185/tcp: 41185
   41186/tcp: 41186
 ports_description:
-  41184/tcp: "Joplin Data API (direct)"
-  41185/tcp: "Joplin Data API (proxied)"
+  41184/tcp: "Joplin Data API"
   41186/tcp: "Management API"
 options:
   sync_target: 0
@@ -31,7 +29,7 @@ options:
   enable_encryption: false
   encryption_password: ""
   sync_config:
-    server_url: ""
+    server_url: "https://yourserver.com"
     username: ""
     password: ""
 schema:
