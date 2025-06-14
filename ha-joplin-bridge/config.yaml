@@ -32,34 +32,13 @@ options:
   sync_username: ""
   sync_password: ""
 schema:
-  - name: sync_target
-    type: list
-    options: [0, 2, 3, 5, 7, 8, 9, 10]
-    default: 0
-  - name: sync_interval
-    type: int
-    default: 300
-    min: 60
-    max: 3600
-  - name: locale
-    type: str
-    default: "en_GB"
-  - name: timezone
-    type: str
-    default: "UTC"
-  - name: enable_encryption
-    type: bool
-    default: false
-  - name: encryption_password
-    type: password
-    optional: true
-  - name: sync_server_url
-    type: str
-    optional: true
-  - name: sync_username
-    type: str
-    optional: true
-  - name: sync_password
-    type: password
-    optional: true
+  sync_target: "list(0|2|3|5|7|8|9|10)"
+  sync_interval: "int(60,3600)"
+  locale: "str"
+  timezone: "str"
+  enable_encryption: "bool"
+  encryption_password: "str?"
+  sync_server_url: "str?"
+  sync_username: "str?"
+  sync_password: "str?"
 image: "ghcr.io/nab0y/{arch}-addon-ha-joplin-bridge"
