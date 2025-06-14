@@ -230,7 +230,7 @@ if __name__ == "__main__":
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind(("0.0.0.0", 41186))
         sock.close()
-        print(f"Port 41186 is available")
+        print("Port 41186 is available")
     except OSError as e:
         print(f"Port 41186 is not available: {e}")
 
