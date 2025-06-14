@@ -95,7 +95,7 @@ jobs:
           context: ./ha-joplin-bridge
           platforms: linux/${{ matrix.architecture }}
           push: true
-          tags: ghcr.io/${{ steps.repo.outputs.owner }}/ha-joplin-bridge:${{ matrix.architecture }}-latest
+          tags: ghcr.io/${{ steps.repo.outputs.owner }}/${{ matrix.architecture }}-addon-ha-joplin-bridge:latest
           build-args: |
             TARGETARCH=${{ matrix.architecture }}
           cache-from: type=gha

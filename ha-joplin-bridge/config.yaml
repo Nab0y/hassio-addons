@@ -31,7 +31,7 @@ options:
   enable_encryption: false
   encryption_password: ""
   sync_config:
-    server_url: "https://yourserver.com"
+    server_url: ""
     username: ""
     password: ""
 schema:
@@ -45,4 +45,4 @@ schema:
     server_url: url?
     username: str?
     password: password?
-image: "ghcr.io/nab0y/ha-joplin-bridge:{arch}-latest"
+image: "ghcr.io/nab0y/{arch}-addon-ha-joplin-bridge"
