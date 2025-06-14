@@ -1,0 +1,13 @@
+name: "Test Add-on"
+description: "Simple test add-on"
+version: "1.0.0"
+slug: test-addon
+arch:
+  - amd64
+  - aarch64
+startup: once
+boot: manual
+init: false
+options: {}
+schema: {}
+image: "alpine:latest"
