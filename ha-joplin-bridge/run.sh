@@ -97,6 +97,7 @@ API_PID=$!
 
 log "All services started successfully"
 log "Joplin PID: $JOPLIN_PID, Socat PID: $SOCAT_PID, API PID: $API_PID"
+log "Auto-sync configured: sync_target=$SYNC_TARGET, interval=${SYNC_INTERVAL}s"
 
 # Cleanup function
 cleanup() {
