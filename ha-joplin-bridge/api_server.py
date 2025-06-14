@@ -203,7 +203,7 @@ def get_info():
     return jsonify(
         {
             "success": True,
-            "addon_version": "1.0.2",
+            "addon_version": "1.0.0",
             "joplin_version": "CLI",
             "status": (
                 status_result["stdout"] if status_result["success"] else "Unknown"
@@ -224,16 +224,16 @@ def get_info():
 
 if __name__ == "__main__":
     import socket
-    
+
     # Check if port is available
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(('0.0.0.0', 41186))
+        sock.bind(("0.0.0.0", 41186))
         sock.close()
         print(f"Port 41186 is available")
     except OSError as e:
         print(f"Port 41186 is not available: {e}")
-    
+
     # Bind to all interfaces for container networking
     print("Starting Flask server on 0.0.0.0:41186")
     app.run(
