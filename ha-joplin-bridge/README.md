@@ -2,7 +2,7 @@
 
 ![Supports aarch64 Architecture](https://img.shields.io/badge/aarch64-yes-green.svg)
 ![Supports amd64 Architecture](https://img.shields.io/badge/amd64-yes-green.svg)
-![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)
 ![AI Assisted](https://img.shields.io/badge/AI%20assisted-🤖-purple.svg)
 
 Bridge between Home Assistant and Joplin with Web Clipper API support.
@@ -52,26 +52,27 @@ For advanced users, copy the `ha-joplin-bridge` folder to your Home Assistant ad
 | `locale` | Interface language | `en_GB` | Any valid locale |
 | `timezone` | Timezone for timestamps | `UTC` | Any valid timezone |
 | `enable_encryption` | Enable E2E encryption | `false` | true/false |
-| `encryption_password` | Encryption password | `""` | Any password |
+| `encryption_password` | Encryption password | `""` | Any password (hidden in UI) |
+| `sync_server_url` | Sync server URL | `""` | Valid URL |
+| `sync_username` | Sync username | `""` | Username for sync service |
+| `sync_password` | Sync password | `""` | Password (hidden in UI) |
 
 ### Sync Configuration Examples
 
 #### Joplin Server (`sync_target: 9`)
 ```yaml
 sync_target: 9
-sync_config:
-  server_url: "https://your-joplin-server.com"
-  username: "your-email@example.com"
-  password: "your-password"
+sync_server_url: "https://your-joplin-server.com"
+sync_username: "your-email@example.com"
+sync_password: "your-password"
 ```
 
 #### Nextcloud/WebDAV (`sync_target: 5`)
 ```yaml
 sync_target: 5
-sync_config:
-  server_url: "https://cloud.example.com/remote.php/dav/files/username/Joplin"
-  username: "your-username"
-  password: "your-app-password"
+sync_server_url: "https://cloud.example.com/remote.php/dav/files/username/Joplin"
+sync_username: "your-username"
+sync_password: "your-app-password"
 ```
 
 #### No Sync (`sync_target: 0`)

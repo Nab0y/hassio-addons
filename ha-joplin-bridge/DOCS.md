@@ -278,10 +278,9 @@ This API provides additional functionality for managing the add-on itself, inclu
 #### Joplin Server Configuration
 ```yaml
 sync_target: 9
-sync_config:
-  server_url: "https://joplin.yourdomain.com"
-  username: "your-email@example.com"
-  password: "your-password"
+sync_server_url: "https://joplin.yourdomain.com"
+sync_username: "your-email@example.com"
+sync_password: "your-password"
 enable_encryption: true
 encryption_password: "your-encryption-password"
 ```
@@ -289,10 +288,9 @@ encryption_password: "your-encryption-password"
 #### Nextcloud Configuration
 ```yaml
 sync_target: 5
-sync_config:
-  server_url: "https://cloud.example.com/remote.php/dav/files/username/Joplin"
-  username: "your-username"
-  password: "your-app-password"  # Use app password, not account password
+sync_server_url: "https://cloud.example.com/remote.php/dav/files/username/Joplin"
+sync_username: "your-username"
+sync_password: "your-app-password"  # Use app password, not account password
 locale: "en_US"
 timezone: "America/New_York"
 ```
@@ -300,7 +298,7 @@ timezone: "America/New_York"
 #### OneDrive Configuration
 ```yaml
 sync_target: 3
-sync_config: {}  # OneDrive uses OAuth, configured through Joplin CLI
+# OneDrive uses OAuth, no username/password needed
 ```
 
 #### Local File System (No External Sync)

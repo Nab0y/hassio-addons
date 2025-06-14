@@ -17,9 +17,9 @@ if [ -f /data/options.json ]; then
     TIMEZONE=$(jq -r '.timezone // "UTC"' /data/options.json)
     ENABLE_ENCRYPTION=$(jq -r '.enable_encryption // false' /data/options.json)
     ENCRYPTION_PASSWORD=$(jq -r '.encryption_password // ""' /data/options.json)
-    SYNC_SERVER_URL=$(jq -r '.sync_config.server_url // ""' /data/options.json)
-    SYNC_USERNAME=$(jq -r '.sync_config.username // ""' /data/options.json)
-    SYNC_PASSWORD=$(jq -r '.sync_config.password // ""' /data/options.json)
+    SYNC_SERVER_URL=$(jq -r '.sync_server_url // ""' /data/options.json)
+    SYNC_USERNAME=$(jq -r '.sync_username // ""' /data/options.json)
+    SYNC_PASSWORD=$(jq -r '.sync_password // ""' /data/options.json)
 else
     log "No options.json found, using defaults"
     SYNC_TARGET="0"
