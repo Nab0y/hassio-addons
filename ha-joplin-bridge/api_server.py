@@ -228,7 +228,7 @@ if __name__ == "__main__":
     # Check if port is available
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(("0.0.0.0", 41186))
+        sock.bind(("0.0.0.0", 41186))  # nosec B104 - container networking
         sock.close()
         print("Port 41186 is available")
     except OSError as e:
