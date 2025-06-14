@@ -1,6 +1,6 @@
 name: "HA Joplin Bridge"
 description: "Bridge between Home Assistant and Joplin with Web Clipper API support"
-version: "1.0.7"
+version: "1.0.8"
 slug: ha-joplin-bridge
 url: "https://github.com/Nab0y/hassio-addons/tree/main/ha-joplin-bridge"
 arch:
@@ -32,13 +32,34 @@ options:
   sync_username: ""
   sync_password: ""
 schema:
-  sync_target: "list(0|2|3|5|7|8|9|10)?"
-  sync_interval: "int(60,3600)?"
-  locale: "str?"
-  timezone: "str?"
-  enable_encryption: "bool?"
-  encryption_password: "password?"
-  sync_server_url: "str?"
-  sync_username: "str?"
-  sync_password: "password?"
+  - name: sync_target
+    type: list
+    options: [0, 2, 3, 5, 7, 8, 9, 10]
+    default: 0
+  - name: sync_interval
+    type: int
+    default: 300
+    min: 60
+    max: 3600
+  - name: locale
+    type: str
+    default: "en_GB"
+  - name: timezone
+    type: str
+    default: "UTC"
+  - name: enable_encryption
+    type: bool
+    default: false
+  - name: encryption_password
+    type: password
+    optional: true
+  - name: sync_server_url
+    type: str
+    optional: true
+  - name: sync_username
+    type: str
+    optional: true
+  - name: sync_password
+    type: password
+    optional: true
 image: "ghcr.io/nab0y/{arch}-addon-ha-joplin-bridge"

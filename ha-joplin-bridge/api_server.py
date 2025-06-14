@@ -103,7 +103,7 @@ def health_check():
             "status": "healthy",
             "joplin_api_available": True,
             "sync_running": sync_status["running"],
-            "addon_version": "1.0.7",
+            "addon_version": "1.0.8",
         }
     )
 
@@ -203,7 +203,7 @@ def get_info():
     return jsonify(
         {
             "success": True,
-            "addon_version": "1.0.7",
+            "addon_version": "1.0.8",
             "joplin_version": "CLI",
             "status": (
                 status_result["stdout"] if status_result["success"] else "Unknown"
