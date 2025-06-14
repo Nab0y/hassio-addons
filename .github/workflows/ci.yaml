@@ -89,14 +89,23 @@ jobs:
         id: repo
         run: echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
       
+      - name: Get add-on version
+        id: version
+        run: |
+          VERSION=$(grep '^version:' ha-joplin-bridge/config.yaml | sed 's/version: *"\?\([^"]*\)"\?/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Add-on version: $VERSION"
+      
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./ha-joplin-bridge
           platforms: linux/${{ matrix.architecture }}
           push: true
-          tags: ghcr.io/${{ steps.repo.outputs.owner }}/${{ matrix.architecture }}-addon-ha-joplin-bridge:latest
+          tags: |
+            ghcr.io/${{ steps.repo.outputs.owner }}/${{ matrix.architecture }}-addon-ha-joplin-bridge:latest
+            ghcr.io/${{ steps.repo.outputs.owner }}/${{ matrix.architecture }}-addon-ha-joplin-bridge:${{ steps.version.outputs.version }}
           build-args: |
-            TARGETARCH=${{ matrix.architecture }}
+            BUILD_FROM=ghcr.io/home-assistant/${{ matrix.architecture }}-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
