@@ -112,7 +112,7 @@ cleanup() {
 # Set trap for cleanup
 trap cleanup SIGTERM SIGINT
 
-# Monitor processes and keep container alive
+# Monitor processes and keep container alive with auto-sync
 while true; do
     if ! kill -0 $JOPLIN_PID 2>/dev/null; then
         log "ERROR: Joplin server stopped!"
@@ -127,6 +127,40 @@ while true; do
         log "ERROR: API server stopped!"
         break
     fi
+    
+    # Auto-sync functionality
+    if [ "$SYNC_TARGET" -ne 0 ]; then
+        CURRENT_TIME=$(date +%s)
+        LAST_SYNC_FILE="/data/joplin/last_sync_time"
+        
+        # Get last sync time or set to 0
+        if [ -f "$LAST_SYNC_FILE" ]; then
+            LAST_SYNC_TIME=$(cat "$LAST_SYNC_FILE")
+        else
+            LAST_SYNC_TIME=0
+        fi
+        
+        # Check if it's time to sync
+        TIME_DIFF=$((CURRENT_TIME - LAST_SYNC_TIME))
+        if [ $TIME_DIFF -ge $SYNC_INTERVAL ]; then
+            log "Auto-sync triggered (interval: ${SYNC_INTERVAL}s, last sync: ${TIME_DIFF}s ago)"
+            
+            # Run sync as joplin user
+            su joplin -c 'export HOME=/data/joplin; cd /data/joplin; joplin sync' > /tmp/auto_sync.log 2>&1 &
+            SYNC_PID=$!
+            
+            # Update last sync time
+            echo $CURRENT_TIME > "$LAST_SYNC_FILE"
+            
+            # Wait for sync to complete (non-blocking)
+            if wait $SYNC_PID; then
+                log "Auto-sync completed successfully"
+            else
+                log "Auto-sync failed, check logs"
+            fi
+        fi
+    fi
+    
     sleep 30
 done
 

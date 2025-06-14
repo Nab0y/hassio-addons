@@ -158,7 +158,7 @@ This API provides additional functionality for managing the add-on itself, inclu
   "status": "healthy",
   "joplin_api_available": true,
   "sync_running": false,
-  "addon_version": "1.0.5"
+  "addon_version": "1.0.4"
 }
 ```
 
@@ -237,7 +237,7 @@ This API provides additional functionality for managing the add-on itself, inclu
 ```json
 {
   "success": true,
-  "addon_version": "1.0.5",
+  "addon_version": "1.0.4",
   "joplin_version": "CLI",
   "status": "Profile created successfully",
   "sync_target": "9",
