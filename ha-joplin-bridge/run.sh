@@ -8,21 +8,20 @@ log() {
 
 log "Starting HA Joplin Bridge..."
 
-# Check if bashio is available
-if command -v bashio >/dev/null 2>&1; then
-    log "Using bashio for configuration"
-    # Get configuration from Home Assistant
-    SYNC_TARGET=$(bashio::config 'sync_target' || echo "0")
-    SYNC_INTERVAL=$(bashio::config 'sync_interval' || echo "300")
-    LOCALE=$(bashio::config 'locale' || echo "en_GB")
-    TIMEZONE=$(bashio::config 'timezone' || echo "UTC")
-    ENABLE_ENCRYPTION=$(bashio::config 'enable_encryption' || echo "false")
-    ENCRYPTION_PASSWORD=$(bashio::config 'encryption_password' || echo "")
-    SYNC_SERVER_URL=$(bashio::config 'sync_config.server_url' || echo "")
-    SYNC_USERNAME=$(bashio::config 'sync_config.username' || echo "")
-    SYNC_PASSWORD=$(bashio::config 'sync_config.password' || echo "")
+# Read configuration from options file (Home Assistant way)
+if [ -f /data/options.json ]; then
+    log "Reading configuration from /data/options.json"
+    SYNC_TARGET=$(jq -r '.sync_target // 0' /data/options.json)
+    SYNC_INTERVAL=$(jq -r '.sync_interval // 300' /data/options.json)
+    LOCALE=$(jq -r '.locale // "en_GB"' /data/options.json)
+    TIMEZONE=$(jq -r '.timezone // "UTC"' /data/options.json)
+    ENABLE_ENCRYPTION=$(jq -r '.enable_encryption // false' /data/options.json)
+    ENCRYPTION_PASSWORD=$(jq -r '.encryption_password // ""' /data/options.json)
+    SYNC_SERVER_URL=$(jq -r '.sync_config.server_url // ""' /data/options.json)
+    SYNC_USERNAME=$(jq -r '.sync_config.username // ""' /data/options.json)
+    SYNC_PASSWORD=$(jq -r '.sync_config.password // ""' /data/options.json)
 else
-    log "Bashio not available, using defaults"
+    log "No options.json found, using defaults"
     SYNC_TARGET="0"
     SYNC_INTERVAL="300"
     LOCALE="en_GB"
@@ -34,7 +33,7 @@ else
     SYNC_PASSWORD=""
 fi
 
-log "Configuration loaded: sync_target=$SYNC_TARGET, locale=$LOCALE"
+log "Configuration: sync_target=$SYNC_TARGET, locale=$LOCALE, timezone=$TIMEZONE"
 
 # Set timezone
 export TZ=$TIMEZONE
@@ -46,9 +45,9 @@ fi
 
 # Create directories and set permissions
 mkdir -p /data/joplin/.config/joplin
-chown -R joplin:joplin /data/joplin || true
+chown -R joplin:joplin /data/joplin 2>/dev/null || true
 
-log "Starting as joplin user..."
+log "Starting services as joplin user..."
 
 # Switch to joplin user and start services
 su joplin -c "
@@ -58,22 +57,23 @@ cd /data/joplin
 echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Configuring Joplin...'
 
 # Create basic Joplin config
-joplin config locale '$LOCALE'
-joplin config sync.target $SYNC_TARGET
-joplin config sync.interval $SYNC_INTERVAL
+joplin config locale '$LOCALE' 2>/dev/null || true
+joplin config sync.target $SYNC_TARGET 2>/dev/null || true
+joplin config sync.interval $SYNC_INTERVAL 2>/dev/null || true
 
 # Configure sync if needed
-if [ '$SYNC_TARGET' -ne 0 ] && [ -n '$SYNC_SERVER_URL' ]; then
-    echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Setting up sync...'
+if [ '$SYNC_TARGET' -ne 0 ] && [ '$SYNC_SERVER_URL' != 'null' ] && [ -n '$SYNC_SERVER_URL' ]; then
+    echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Setting up sync for target $SYNC_TARGET...'
     if [ '$SYNC_TARGET' -eq 9 ]; then
-        joplin config sync.9.path '$SYNC_SERVER_URL'
-        [ -n '$SYNC_USERNAME' ] && joplin config sync.9.username '$SYNC_USERNAME'
-        [ -n '$SYNC_PASSWORD' ] && joplin config sync.9.password '$SYNC_PASSWORD'
+        joplin config sync.9.path '$SYNC_SERVER_URL' 2>/dev/null || true
+        [ '$SYNC_USERNAME' != 'null' ] && [ -n '$SYNC_USERNAME' ] && joplin config sync.9.username '$SYNC_USERNAME' 2>/dev/null || true
+        [ '$SYNC_PASSWORD' != 'null' ] && [ -n '$SYNC_PASSWORD' ] && joplin config sync.9.password '$SYNC_PASSWORD' 2>/dev/null || true
     elif [ '$SYNC_TARGET' -eq 5 ]; then
-        joplin config sync.5.path '$SYNC_SERVER_URL'
-        [ -n '$SYNC_USERNAME' ] && joplin config sync.5.username '$SYNC_USERNAME'
-        [ -n '$SYNC_PASSWORD' ] && joplin config sync.5.password '$SYNC_PASSWORD'
+        joplin config sync.5.path '$SYNC_SERVER_URL' 2>/dev/null || true
+        [ '$SYNC_USERNAME' != 'null' ] && [ -n '$SYNC_USERNAME' ] && joplin config sync.5.username '$SYNC_USERNAME' 2>/dev/null || true
+        [ '$SYNC_PASSWORD' != 'null' ] && [ -n '$SYNC_PASSWORD' ] && joplin config sync.5.password '$SYNC_PASSWORD' 2>/dev/null || true
     fi
+    echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Sync configuration completed'
 fi
 
 echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Starting Joplin server on port 41184...'
@@ -81,14 +81,29 @@ joplin server start --port 41184 &
 JOPLIN_PID=\$!
 
 # Wait for Joplin to start
-sleep 5
+sleep 8
 
 echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Starting management API on port 41186...'
 python3 /api_server.py &
 API_PID=\$!
 
-echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Services started - Joplin PID: \$JOPLIN_PID, API PID: \$API_PID'
+echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] All services started successfully'
+echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Joplin PID: \$JOPLIN_PID, API PID: \$API_PID'
 
-# Wait for processes
-wait \$JOPLIN_PID \$API_PID
+# Simple monitoring
+while true; do
+    if ! kill -0 \$JOPLIN_PID 2>/dev/null; then
+        echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] ERROR: Joplin server stopped!'
+        break
+    fi
+    if ! kill -0 \$API_PID 2>/dev/null; then
+        echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] ERROR: API server stopped!'
+        break
+    fi
+    sleep 30
+done
+
+echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Service monitoring ended'
 "
+
+log "Container finished"

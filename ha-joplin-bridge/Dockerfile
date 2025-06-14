@@ -10,11 +10,7 @@ RUN apk add --no-cache \
     jq \
     tzdata \
     python3 \
-    py3-flask \
-    py3-pip
-
-# Install bashio (Home Assistant helper)
-RUN pip3 install --no-cache-dir bashio
+    py3-flask
 
 # Create user
 RUN addgroup -g 1000 joplin && \
