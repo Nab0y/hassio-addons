@@ -236,4 +236,6 @@ if __name__ == "__main__":
 
     # Bind to all interfaces for container networking
     print("Starting Flask server on 0.0.0.0:41186")
-    app.run(host="0.0.0.0", port=41186, debug=False)  # nosec B104 - controlled environment
+    # Using 0.0.0.0 is safe in container environment
+    host = "0.0.0.0"  # nosec B104 - controlled environment
+    app.run(host=host, port=41186, debug=False)
