@@ -1,6 +1,6 @@
 name: "HA Joplin Bridge"
 description: "Bridge between Home Assistant and Joplin with Web Clipper API support"
-version: "1.0.0"
+version: "1.0.1"
 slug: ha-joplin-bridge
 url: "https://github.com/Nab0y/hassio-addons/tree/main/ha-joplin-bridge"
 arch:

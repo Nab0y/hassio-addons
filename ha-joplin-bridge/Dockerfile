@@ -9,9 +9,12 @@ RUN apk add --no-cache \
     curl \
     jq \
     tzdata \
-    socat \
     python3 \
-    py3-flask
+    py3-flask \
+    py3-pip
+
+# Install bashio (Home Assistant helper)
+RUN pip3 install --no-cache-dir bashio
 
 # Create user
 RUN addgroup -g 1000 joplin && \
@@ -32,7 +35,7 @@ RUN chmod +x /run.sh
 WORKDIR /data/joplin
 
 # Export ports
-EXPOSE 41184 41185 41186
+EXPOSE 41184 41186
 
 # Start
 CMD ["/run.sh"]
