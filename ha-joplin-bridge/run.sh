@@ -49,61 +49,75 @@ chown -R joplin:joplin /data/joplin 2>/dev/null || true
 
 log "Starting services as joplin user..."
 
-# Switch to joplin user and start services
-su joplin -c "
+# Configure Joplin as joplin user
+su joplin -c '
 export HOME=/data/joplin
 cd /data/joplin
 
-echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Configuring Joplin...'
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Configuring Joplin..."
 
 # Create basic Joplin config
-joplin config locale '$LOCALE' 2>/dev/null || true
-joplin config sync.target $SYNC_TARGET 2>/dev/null || true
-joplin config sync.interval $SYNC_INTERVAL 2>/dev/null || true
+joplin config locale "'"$LOCALE"'" 2>/dev/null || true
+joplin config sync.target '"$SYNC_TARGET"' 2>/dev/null || true
+joplin config sync.interval '"$SYNC_INTERVAL"' 2>/dev/null || true
 
 # Configure sync if needed
-if [ '$SYNC_TARGET' -ne 0 ] && [ '$SYNC_SERVER_URL' != 'null' ] && [ -n '$SYNC_SERVER_URL' ]; then
-    echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Setting up sync for target $SYNC_TARGET...'
-    if [ '$SYNC_TARGET' -eq 9 ]; then
-        joplin config sync.9.path '$SYNC_SERVER_URL' 2>/dev/null || true
-        [ '$SYNC_USERNAME' != 'null' ] && [ -n '$SYNC_USERNAME' ] && joplin config sync.9.username '$SYNC_USERNAME' 2>/dev/null || true
-        [ '$SYNC_PASSWORD' != 'null' ] && [ -n '$SYNC_PASSWORD' ] && joplin config sync.9.password '$SYNC_PASSWORD' 2>/dev/null || true
-    elif [ '$SYNC_TARGET' -eq 5 ]; then
-        joplin config sync.5.path '$SYNC_SERVER_URL' 2>/dev/null || true
-        [ '$SYNC_USERNAME' != 'null' ] && [ -n '$SYNC_USERNAME' ] && joplin config sync.5.username '$SYNC_USERNAME' 2>/dev/null || true
-        [ '$SYNC_PASSWORD' != 'null' ] && [ -n '$SYNC_PASSWORD' ] && joplin config sync.5.password '$SYNC_PASSWORD' 2>/dev/null || true
+if [ '"$SYNC_TARGET"' -ne 0 ] && [ "'"$SYNC_SERVER_URL"'" != "null" ] && [ -n "'"$SYNC_SERVER_URL"'" ]; then
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Setting up sync for target '"$SYNC_TARGET"'..."
+    if [ '"$SYNC_TARGET"' -eq 9 ]; then
+        joplin config sync.9.path "'"$SYNC_SERVER_URL"'" 2>/dev/null || true
+        [ "'"$SYNC_USERNAME"'" != "null" ] && [ -n "'"$SYNC_USERNAME"'" ] && joplin config sync.9.username "'"$SYNC_USERNAME"'" 2>/dev/null || true
+        [ "'"$SYNC_PASSWORD"'" != "null" ] && [ -n "'"$SYNC_PASSWORD"'" ] && joplin config sync.9.password "'"$SYNC_PASSWORD"'" 2>/dev/null || true
+    elif [ '"$SYNC_TARGET"' -eq 5 ]; then
+        joplin config sync.5.path "'"$SYNC_SERVER_URL"'" 2>/dev/null || true
+        [ "'"$SYNC_USERNAME"'" != "null" ] && [ -n "'"$SYNC_USERNAME"'" ] && joplin config sync.5.username "'"$SYNC_USERNAME"'" 2>/dev/null || true
+        [ "'"$SYNC_PASSWORD"'" != "null" ] && [ -n "'"$SYNC_PASSWORD"'" ] && joplin config sync.5.password "'"$SYNC_PASSWORD"'" 2>/dev/null || true
     fi
-    echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Sync configuration completed'
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Sync configuration completed"
 fi
+'
 
-echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Starting Joplin server on port 41184...'
-joplin server start --port 41184 &
-JOPLIN_PID=\$!
+log "Starting Joplin server..."
+# Start Joplin server as joplin user
+su joplin -c 'export HOME=/data/joplin; cd /data/joplin; joplin server start --port 41184' &
+JOPLIN_PID=$!
 
 # Wait for Joplin to start
-sleep 8
+sleep 10
 
-echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Starting management API on port 41186...'
+log "Starting management API server..."
+# Start API server as root (needs access to ports)
 python3 /api_server.py &
-API_PID=\$!
+API_PID=$!
 
-echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] All services started successfully'
-echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Joplin PID: \$JOPLIN_PID, API PID: \$API_PID'
+log "All services started successfully"
+log "Joplin PID: $JOPLIN_PID, API PID: $API_PID"
 
-# Simple monitoring
+# Cleanup function
+cleanup() {
+    log "Shutting down services..."
+    kill $API_PID 2>/dev/null || true
+    kill $JOPLIN_PID 2>/dev/null || true
+    wait
+    log "Shutdown complete"
+    exit 0
+}
+
+# Set trap for cleanup
+trap cleanup SIGTERM SIGINT
+
+# Monitor processes and keep container alive
 while true; do
-    if ! kill -0 \$JOPLIN_PID 2>/dev/null; then
-        echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] ERROR: Joplin server stopped!'
+    if ! kill -0 $JOPLIN_PID 2>/dev/null; then
+        log "ERROR: Joplin server stopped!"
         break
     fi
-    if ! kill -0 \$API_PID 2>/dev/null; then
-        echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] ERROR: API server stopped!'
+    if ! kill -0 $API_PID 2>/dev/null; then
+        log "ERROR: API server stopped!"
         break
     fi
     sleep 30
 done
 
-echo '[$(date +\"%Y-%m-%d %H:%M:%S\")] Service monitoring ended'
-"
-
-log "Container finished"
+log "One or more services stopped. Cleaning up..."
+cleanup
