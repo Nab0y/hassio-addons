@@ -158,7 +158,7 @@ This API provides additional functionality for managing the add-on itself, inclu
   "status": "healthy",
   "joplin_api_available": true,
   "sync_running": false,
-  "addon_version": "1.0.8"
+  "addon_version": "1.0.9"
 }
 ```
 
@@ -237,7 +237,7 @@ This API provides additional functionality for managing the add-on itself, inclu
 ```json
 {
   "success": true,
-  "addon_version": "1.0.8",
+  "addon_version": "1.0.9",
   "joplin_version": "CLI",
   "status": "Profile created successfully",
   "sync_target": "9",
@@ -262,16 +262,24 @@ This API provides additional functionality for managing the add-on itself, inclu
 
 ### Synchronization Targets
 
-| Value | Service | Description |
-|-------|---------|-------------|
-| `0` | None | No synchronization |
-| `2` | File System | Local file system sync |
-| `3` | OneDrive | Microsoft OneDrive |
-| `5` | Nextcloud/WebDAV | Nextcloud or any WebDAV server |
-| `7` | Dropbox | Dropbox cloud storage |
-| `8` | S3 Compatible | Amazon S3 or compatible storage |
-| `9` | Joplin Server | Dedicated Joplin Server |
-| `10` | Joplin Cloud | Official Joplin Cloud service |
+| Value | Service | Description | Containerized Support |
+|-------|---------|-------------|----------------------|
+| `0` | None | No synchronization | ✅ Full Support |
+| `5` | Nextcloud/WebDAV | Nextcloud or any WebDAV server | ✅ Full Support |
+| `8` | S3 Compatible | Amazon S3 or compatible storage | ✅ Full Support |
+| `9` | Joplin Server | Dedicated Joplin Server | ✅ Full Support |
+
+### ⚠️ Unsupported Sync Targets:
+
+**Require browser OAuth (not compatible with containers):**
+- `3` OneDrive - Requires Microsoft OAuth authentication
+- `7` Dropbox - Requires Dropbox OAuth authentication  
+- `10` Joplin Cloud - Requires Joplin Cloud authentication
+
+**Not practical in Home Assistant environment:**
+- `2` File System - Limited to container `/share` folder, no real synchronization benefits
+
+These services are excluded from the configuration options to avoid user confusion.
 
 ### Configuration Examples
 
@@ -295,13 +303,17 @@ locale: "en_US"
 timezone: "America/New_York"
 ```
 
-#### OneDrive Configuration
+#### S3 Compatible Storage Configuration  
 ```yaml
-sync_target: 3
-# OneDrive uses OAuth, no username/password needed
+sync_target: 8
+sync_server_url: "https://s3.amazonaws.com"  # or your S3-compatible endpoint
+sync_username: "your-access-key-id"
+sync_password: "your-secret-access-key"
+enable_encryption: true
+encryption_password: "your-encryption-password"
 ```
 
-#### Local File System (No External Sync)
+#### No External Sync (Local Only)
 ```yaml
 sync_target: 0
 locale: "en_GB"

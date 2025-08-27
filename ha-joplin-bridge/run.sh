@@ -72,6 +72,10 @@ if [ '"$SYNC_TARGET"' -ne 0 ] && [ "'"$SYNC_SERVER_URL"'" != "null" ] && [ -n "'
         joplin config sync.5.path "'"$SYNC_SERVER_URL"'" 2>/dev/null || true
         [ "'"$SYNC_USERNAME"'" != "null" ] && [ -n "'"$SYNC_USERNAME"'" ] && joplin config sync.5.username "'"$SYNC_USERNAME"'" 2>/dev/null || true
         [ "'"$SYNC_PASSWORD"'" != "null" ] && [ -n "'"$SYNC_PASSWORD"'" ] && joplin config sync.5.password "'"$SYNC_PASSWORD"'" 2>/dev/null || true
+    elif [ '"$SYNC_TARGET"' -eq 8 ]; then
+        joplin config sync.8.path "'"$SYNC_SERVER_URL"'" 2>/dev/null || true
+        [ "'"$SYNC_USERNAME"'" != "null" ] && [ -n "'"$SYNC_USERNAME"'" ] && joplin config sync.8.accessKeyId "'"$SYNC_USERNAME"'" 2>/dev/null || true
+        [ "'"$SYNC_PASSWORD"'" != "null" ] && [ -n "'"$SYNC_PASSWORD"'" ] && joplin config sync.8.secretAccessKey "'"$SYNC_PASSWORD"'" 2>/dev/null || true
     fi
     echo "[$(date +"%Y-%m-%d %H:%M:%S")] Sync configuration completed"
 fi

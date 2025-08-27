@@ -2,7 +2,7 @@
 
 ![Supports aarch64 Architecture](https://img.shields.io/badge/aarch64-yes-green.svg)
 ![Supports amd64 Architecture](https://img.shields.io/badge/amd64-yes-green.svg)
-![Version](https://img.shields.io/badge/version-1.0.8-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.9-blue.svg)
 ![AI Assisted](https://img.shields.io/badge/AI%20assisted-🤖-purple.svg)
 
 Bridge between Home Assistant and Joplin with Web Clipper API support.
@@ -13,10 +13,22 @@ Bridge between Home Assistant and Joplin with full API support for creating auto
 
 - 🌐 **Web Clipper API** (Port 41185) - Full Joplin REST API for notes, notebooks, and tags
 - 🔧 **Management API** (Port 41186) - Sync control, health monitoring, system information
-- 🔄 **Multi-Service Sync** - Joplin Server, Nextcloud, OneDrive, Dropbox, S3, and more
+- 🔄 **Multi-Service Sync** - Joplin Server, Nextcloud, S3, and local filesystem
 - 📝 **HA Automation Ready** - REST commands and sensors for seamless integration
 - 🔒 **Encryption Support** - Optional end-to-end encryption for sensitive data
 - 🚀 **Multi-Platform** - aarch64 and amd64 architecture support
+
+## ⚠️ Sync Service Compatibility
+
+This containerized add-on supports sync services that work well in Home Assistant environment:
+- ✅ **Joplin Server** - Dedicated Joplin synchronization server
+- ✅ **Nextcloud/WebDAV** - Popular self-hosted solution  
+- ✅ **S3 Compatible** - Cloud storage (AWS S3, MinIO, etc.)
+- ✅ **No Sync** - Local storage only
+
+**Not supported:**
+- ❌ **OAuth Services** - OneDrive, Dropbox, Joplin Cloud (require browser)
+- ❌ **FileSystem Sync** - Not practical in containerized HA environment
 
 ## Installation
 
@@ -58,6 +70,14 @@ sync_username: "your-username"
 sync_password: "your-app-password"
 ```
 
+#### S3 Compatible Storage
+```yaml
+sync_target: 8
+sync_server_url: "https://s3.amazonaws.com"
+sync_username: "your-access-key-id"
+sync_password: "your-secret-access-key"
+```
+
 #### Local Only (No Sync)
 ```yaml
 sync_target: 0
@@ -69,7 +89,7 @@ timezone: "UTC"
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `sync_target` | Sync service (0=None, 5=Nextcloud, 9=Joplin Server, etc.) | `0` |
+| `sync_target` | Sync service (0=None, 5=Nextcloud, 8=S3, 9=Joplin Server) | `0` |
 | `sync_server_url` | Server URL for sync service | `""` |
 | `sync_username` | Username for sync service | `""` |
 | `sync_password` | Password for sync service | `""` |
