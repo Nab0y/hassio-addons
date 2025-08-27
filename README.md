@@ -3,38 +3,32 @@
 ![Project Stage][project-stage-shield]
 [![License][license-shield]](LICENSE)
 
+Custom Home Assistant add-ons developed with AI assistance. Functional, tested, and ready to use!
+
 ## ⚠️ Important Notice
 
-**ATTENTION!** This add-on was created through vibe coding with LLM assistance. I'm not particularly strong in Python programming, so please don't be too harsh if something goes wrong. 
+**AI-Assisted Development**: These add-ons are created with modern AI tools and collaborative development approach. They are fully functional and tested, though may not follow all traditional development conventions.
 
-🤖 **AI-Assisted Development**: These add-ons are the result of collaborative work between human creativity and AI assistance. While functional and tested, they may not follow all best practices that a seasoned developer would implement.
-
-🐛 **Bug Reports Welcome**: If you encounter issues, please report them! It's a learning experience for both the code and the developer.
-
-## About
-
-This repository contains custom Home Assistant add-ons developed with the help of modern AI tools. Each add-on aims to extend Home Assistant functionality, though the journey might be a bit unconventional!
+**Bug Reports Welcome**: If you encounter issues, please report them! Contributions and improvements are always appreciated.
 
 ## Add-ons
 
 ### [HA Joplin Bridge](ha-joplin-bridge/)
 
-![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.8-blue.svg)
 ![Supports aarch64 Architecture](https://img.shields.io/badge/aarch64-yes-green.svg)
 ![Supports amd64 Architecture](https://img.shields.io/badge/amd64-yes-green.svg)
 ![AI Assisted](https://img.shields.io/badge/AI%20assisted-🤖-purple.svg)
 
 Bridge between Home Assistant and Joplin with Web Clipper API support.
 
-**Features:**
-- 🌐 Web Clipper API for creating and managing notes
-- 🔄 Synchronization with various services (Joplin Server, Nextcloud, OneDrive, etc.)
-- 🔧 Management API for sync control and monitoring
-- 📝 Home Assistant automations with Joplin notes
-- 🔒 End-to-end encryption support
-- 🚀 Support for modern architectures (aarch64, amd64)
-
-**⚠️ Disclaimer**: This add-on was created with AI assistance. While it works, expect some rough edges and please be patient with any quirks!
+**Key Features:**
+- 🌐 **Web Clipper API** - Full Joplin REST API for notes and notebooks
+- 🔄 **Multi-Service Sync** - Joplin Server, Nextcloud, OneDrive, Dropbox, S3
+- 🔧 **Management API** - Sync control, status monitoring, system info  
+- 📝 **HA Integration** - Perfect for automations and event logging
+- 🔒 **Encryption** - Optional end-to-end encryption support
+- 🚀 **Multi-Platform** - Supports aarch64 and amd64 architectures
 
 [📖 Documentation](ha-joplin-bridge/DOCS.md) | [📋 Changelog](ha-joplin-bridge/CHANGELOG.md)
 
@@ -62,93 +56,46 @@ For advanced users who want to install add-ons manually, copy the add-on folder 
 
 ## Support & Troubleshooting
 
-### 🆘 Getting Help
+### Getting Help
 
 If you encounter issues:
 
-1. **Don't panic!** Remember, this is experimental AI-assisted code
-2. **Check the documentation** - each add-on has detailed docs
-3. **Review logs** - Home Assistant → Settings → System → Logs
-4. **Be specific** - when reporting issues, include detailed information
+1. **Check the documentation** - detailed docs available for each add-on
+2. **Review logs** - Home Assistant → Settings → Add-ons → [Add-on] → Logs  
+3. **Check GitHub Issues** - search for similar problems and solutions
+4. **Be specific** - include HA version, add-on version, error messages, and reproduction steps
 
-### 📝 Reporting Issues
+### Community Support
 
-When creating issues, please include:
-- Home Assistant version
-- Add-on version
-- Complete error messages from logs
-- Steps to reproduce the problem
-- **Patience** - remember the developer is learning too! 😅
-
-### 🤝 Community Support
-
-Since these are AI-assisted projects:
-- **Community contributions** are especially welcome
-- **Code reviews** from experienced developers are appreciated
-- **Suggestions** for improvements are always helpful
+- **Bug reports** with detailed information
+- **Feature requests** and improvement suggestions  
+- **Code contributions** and reviews are welcome
+- **Documentation improvements** and examples
 
 ## Contributing
 
-This project embraces the "learning by doing" philosophy!
+### Ways to Contribute
+- 🐛 **Bug Reports** - detailed issue descriptions with logs
+- 💡 **Feature Requests** - suggest improvements and new functionality
+- 🔧 **Pull Requests** - code fixes, enhancements, and optimizations
+- 📖 **Documentation** - improve guides, examples, and explanations
+- ⭐ **Star the repo** - show appreciation for the project
 
-### 🎯 Ways to contribute:
-- 🐛 **Report bugs** (with patience and understanding)
-- 💡 **Suggest improvements** to AI-generated code
-- 🔧 **Submit pull requests** with fixes or enhancements
-- 📖 **Improve documentation** and code comments
-- 🎓 **Share knowledge** - help improve the development process
-- ⭐ **Star the repository** if you appreciate the experimental approach
-
-### 👩‍💻 Development Philosophy
-
-This repository represents:
-- **Experimental development** with AI assistance
-- **Learning in public** approach
-- **Community-driven improvements**
-- **Embracing imperfection** while striving for functionality
-
-### 🔍 Code Quality
-
-While created with AI assistance, efforts are made to ensure:
-- ✅ Basic functionality works
-- ✅ Security best practices are followed (with AI guidance)
-- ✅ Code is reasonably documented
-- ⚠️ May not follow all advanced Python conventions
+### Development Guidelines
+- Follow existing code style and conventions
+- Test changes thoroughly before submitting
+- Update documentation for new features
+- Use clear commit messages and PR descriptions
 
 ## Roadmap
 
-Planned future add-ons (with continued AI assistance):
+Future add-ons in planning:
 - 📊 **Analytics Dashboard** - Custom metrics and visualization
-- 🔐 **Security Monitor** - Enhanced security monitoring
+- 🔐 **Security Monitor** - Enhanced security monitoring  
 - 🏠 **Smart Home Hub** - Advanced device management
 - 📱 **Mobile Notifications** - Extended notification system
 
-*All future add-ons will continue the AI-assisted development approach. Suggestions and collaborations welcome!*
-
-## Disclaimer & Philosophy
-
-### 🤖 About AI-Assisted Development
-
-This repository is an experiment in:
-- Human creativity + AI capability
-- Learning programming through practical projects
-- Building useful tools despite technical limitations
-- Embracing modern development workflows
-
-### ⚖️ Use at Your Own Risk
-
-- These add-ons work, but may have unexpected behaviors
-- Code quality might not meet professional standards
-- Updates may be irregular as the human learns
-- Community support is essential for improvement
-
-### 🎓 Learning Journey
-
-This project represents a journey of:
-- **Learning Python** through real projects
-- **Understanding Home Assistant** add-on development
-- **Exploring AI-assisted** programming
-- **Building community** around experimental code
+*Suggestions and feature requests welcome!*
 
 ## License
 
@@ -156,19 +103,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 **Translation**: You can use this code, improve it, learn from it, but don't blame us if your smart home becomes sentient! 🤖
 
-## Acknowledgments
-
-- 🤖 **AI Assistant** - for patient code generation and debugging help
-- 🏠 **Home Assistant community** - for inspiration and tolerance of experimental add-ons
-- 👥 **All contributors** - who help improve these learning projects
-- 🧪 **Beta testers** - brave souls who try AI-generated home automation code
-- 📚 **Online tutorials** - that fill the gaps AI can't explain
-
 ---
 
-**⚡ Made with ❤️, 🤖 AI assistance, and lots of ☕ coffee for the Home Assistant community**
-
-*"If it works, it's not stupid!" - Ancient developer proverb*
+**Made with ❤️ and 🤖 AI assistance for the Home Assistant community**
 
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental%20AI--assisted-orange.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2024.svg
