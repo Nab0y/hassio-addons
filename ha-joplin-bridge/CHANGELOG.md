@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2024-12-04
+
+### Changed
+- Password fields (`encryption_password` and `sync_password`) now use secure password input type in UI
+- Passwords are now properly masked in Home Assistant configuration interface
+
+### Security
+- Improved password handling in configuration UI
+
 ## [1.0.9] - 2024-12-27
 
 ### Changed
