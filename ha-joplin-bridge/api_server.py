@@ -204,19 +204,21 @@ def proxy_to_joplin(profile_name: str, path: str, method: str, data=None) -> Res
 
         # Filter out problematic headers that Flask/waitress will set automatically
         excluded_headers = {
-            'content-length', 'transfer-encoding', 'connection', 
-            'keep-alive', 'server'
+            "content-length",
+            "transfer-encoding",
+            "connection",
+            "keep-alive",
+            "server",
         }
         safe_headers = {
-            k: v for k, v in resp.headers.items() 
-            if k.lower() not in excluded_headers
+            k: v for k, v in resp.headers.items() if k.lower() not in excluded_headers
         }
 
         return Response(
             resp.content,
             status=resp.status_code,
             headers=safe_headers,
-            content_type=resp.headers.get('Content-Type', 'application/json')
+            content_type=resp.headers.get("Content-Type", "application/json"),
         )
 
     except requests.exceptions.RequestException as e:
