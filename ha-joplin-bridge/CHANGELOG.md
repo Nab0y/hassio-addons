@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.2] - 2025-12-21
+
+### Fixed
+- Port conflict in single-user mode: Data API Proxy no longer starts when socat is handling port 41185
+- Improved process monitoring to skip Data API Proxy checks in single-user mode
+
 ## [2.0.1] - 2025-12-21
 
 ### Fixed
