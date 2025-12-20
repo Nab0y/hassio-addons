@@ -144,7 +144,7 @@ sleep 10
 
 # Start API servers
 log "Starting Management API server on port 41186..."
-python3 /api_server.py 2>&1 &
+python3 /api_server.py > /tmp/mgmt_api.log 2>&1 &
 MGMT_API_PID=$!
 log "Management API PID: $MGMT_API_PID"
 
@@ -154,11 +154,17 @@ sleep 2
 # Check if it's still running
 if ! kill -0 "$MGMT_API_PID" 2>/dev/null; then
     log "ERROR: Management API failed to start!"
+    log "Management API output:"
+    cat /tmp/mgmt_api.log 2>/dev/null || log "No log file found"
     exit 1
+else
+    log "Management API started successfully"
+    # Show first few lines of output
+    head -n 10 /tmp/mgmt_api.log 2>/dev/null || true
 fi
 
 log "Starting Joplin Data API Proxy on port 41185..."
-python3 /api_server.py --data-api 2>&1 &
+python3 /api_server.py --data-api > /tmp/data_api.log 2>&1 &
 DATA_API_PID=$!
 log "Data API Proxy PID: $DATA_API_PID"
 
@@ -168,7 +174,13 @@ sleep 2
 # Check if it's still running
 if ! kill -0 "$DATA_API_PID" 2>/dev/null; then
     log "ERROR: Data API Proxy failed to start!"
+    log "Data API Proxy output:"
+    cat /tmp/data_api.log 2>/dev/null || log "No log file found"
     exit 1
+else
+    log "Data API Proxy started successfully"
+    # Show first few lines of output
+    head -n 10 /tmp/data_api.log 2>/dev/null || true
 fi
 
 log "All services started successfully"
