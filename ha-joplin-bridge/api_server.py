@@ -87,9 +87,7 @@ def get_profile_port(profile_name: str) -> int:
     raise ValueError(f"Profile {profile_name} not found")
 
 
-def run_joplin_command(
-    profile_name: str, command: str, args=None, timeout=120
-) -> Dict:
+def run_joplin_command(profile_name: str, command: str, args=None, timeout=120) -> Dict:
     """Execute Joplin CLI command for specific profile"""
     try:
         if not isinstance(command, str) or not command.replace("_", "").isalnum():
@@ -199,7 +197,9 @@ def proxy_to_joplin(profile_name: str, path: str, method: str, data=None) -> Res
         else:
             return Response("Method not allowed", status=405)
 
-        return Response(resp.content, status=resp.status_code, headers=dict(resp.headers))
+        return Response(
+            resp.content, status=resp.status_code, headers=dict(resp.headers)
+        )
 
     except requests.exceptions.RequestException as e:
         app.logger.error(f"Proxy error: {e}")
@@ -360,7 +360,9 @@ def sync_status_endpoint():
 
     if config["mode"] == "multi" and not profile_name:
         # Return all statuses
-        return jsonify({"success": True, "mode": "multi-tenant", "statuses": sync_status})
+        return jsonify(
+            {"success": True, "mode": "multi-tenant", "statuses": sync_status}
+        )
     else:
         if not profile_name:
             profile_name = "default"
