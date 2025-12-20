@@ -35,20 +35,13 @@ def load_configuration():
 
         users = options.get("users", [])
 
-        if len(users) > 0:
-            config["mode"] = "multi"
-            config["users"] = users
-            app.logger.info(f"Multi-tenant mode: {len(users)} users configured")
-        else:
-            config["mode"] = "single"
-            config["users"] = [
-                {
-                    "name": "default",
-                    "sync_target": options.get("sync_target", 0),
-                    "sync_interval": options.get("sync_interval", 300),
-                }
-            ]
-            app.logger.info("Single-user mode (legacy)")
+        if len(users) == 0:
+            app.logger.error("No users configured! Please add users array to configuration.")
+            return False
+
+        config["mode"] = "multi"
+        config["users"] = users
+        app.logger.info(f"Multi-tenant mode: {len(users)} users configured")
 
         # Initialize sync status for each user
         for user in config["users"]:
@@ -68,17 +61,11 @@ def load_configuration():
 
 def get_profile_dir(profile_name: str) -> str:
     """Get profile directory path"""
-    if config["mode"] == "single":
-        return "/data/joplin"
-    else:
-        return f"/data/joplin/profiles/{profile_name}"
+    return f"/data/joplin/profiles/{profile_name}"
 
 
 def get_profile_port(profile_name: str) -> int:
     """Get Joplin server port for a profile"""
-    if config["mode"] == "single":
-        return 41184
-
     # Find user index and calculate port
     for idx, user in enumerate(config["users"]):
         if user["name"] == profile_name:
@@ -251,42 +238,24 @@ def health_check():
 
 @app.route("/token", methods=["GET"])
 def get_token():
-    """Get Joplin API token(s)"""
-    if config["mode"] == "single":
-        # Legacy single-user mode
-        token = get_token_for_profile("default")
+    """Get Joplin API token(s) for all users"""
+    tokens = {}
+    for user in config["users"]:
+        profile_name = user["name"]
+        token = get_token_for_profile(profile_name)
         if token:
-            return jsonify(
-                {
-                    "success": True,
-                    "token": token,
-                    "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
-                }
-            )
-        else:
-            return (
-                jsonify({"success": False, "error": "Failed to get token"}),
-                500,
-            )
-    else:
-        # Multi-tenant mode - return all tokens
-        tokens = {}
-        for user in config["users"]:
-            profile_name = user["name"]
-            token = get_token_for_profile(profile_name)
-            if token:
-                tokens[profile_name] = {
-                    "token": token,
-                    "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
-                }
-
-        return jsonify(
-            {
-                "success": True,
-                "mode": "multi-tenant",
-                "users": tokens,
+            tokens[profile_name] = {
+                "token": token,
+                "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
             }
-        )
+
+    return jsonify(
+        {
+            "success": True,
+            "mode": "multi-tenant",
+            "users": tokens,
+        }
+    )
 
 
 @app.route("/sync", methods=["POST"])
@@ -296,19 +265,16 @@ def sync_notes():
     background = data.get("background", True)
     profile_name = data.get("profile", None)
 
-    if config["mode"] == "multi" and not profile_name:
+    if not profile_name:
         return (
             jsonify(
                 {
                     "success": False,
-                    "error": "Profile name required in multi-tenant mode",
+                    "error": "Profile name required",
                 }
             ),
             400,
         )
-
-    if not profile_name:
-        profile_name = "default"
 
     if sync_status[profile_name]["running"]:
         return (
@@ -358,21 +324,22 @@ def sync_status_endpoint():
     """Get synchronization status"""
     profile_name = request.args.get("profile", None)
 
-    if config["mode"] == "multi" and not profile_name:
+    if not profile_name:
         # Return all statuses
         return jsonify(
             {"success": True, "mode": "multi-tenant", "statuses": sync_status}
         )
     else:
-        if not profile_name:
-            profile_name = "default"
         return jsonify({"success": True, "status": sync_status.get(profile_name, {})})
 
 
 @app.route("/info", methods=["GET"])
 def get_info():
     """Get Joplin information"""
-    profile_name = request.args.get("profile", "default")
+    profile_name = request.args.get("profile", None)
+    
+    if not profile_name and len(config["users"]) > 0:
+        profile_name = config["users"][0]["name"]
 
     status_result = run_joplin_command(profile_name, "status")
     config_result = run_joplin_command(profile_name, "config", ["sync.target"])
@@ -399,8 +366,7 @@ def get_info():
         "joplin_data_api_url": f'http://{request.host.split(":")[0]}:41185',
     }
 
-    if config["mode"] == "multi":
-        info["users"] = [user["name"] for user in config["users"]]
+    info["users"] = [user["name"] for user in config["users"]]
 
     return jsonify(info)
 
