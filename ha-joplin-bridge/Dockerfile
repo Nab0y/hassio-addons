@@ -1,8 +1,8 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-# Install system dependencies first
-RUN apk add --no-cache \
+# Install dependencies
+RUN apk add --no-cache --no-scripts \
     nodejs \
     npm \
     bash \
@@ -10,12 +10,12 @@ RUN apk add --no-cache \
     jq \
     tzdata \
     socat \
-    python3
+    python3 \
+    py3-pip \
+    py3-flask
 
-# Install Python packages separately to avoid busybox trigger issues
-RUN apk add --no-cache \
-    py3-flask \
-    py3-waitress
+# Install waitress via pip to avoid apk trigger issues
+RUN pip3 install --no-cache-dir --break-system-packages waitress
 
 # Create user
 RUN addgroup -g 1000 joplin && \
