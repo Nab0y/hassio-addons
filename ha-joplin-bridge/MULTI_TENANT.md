@@ -49,6 +49,7 @@ Version 2.0.0 adds **multi-tenant** mode support, allowing multiple Home Assista
 users:
   - name: "dad"
     sync_target: 9
+    sync_interval: 300  # Auto-sync every 5 minutes
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "dad@family.com"
     sync_password: "password1"
@@ -58,6 +59,7 @@ users:
     
   - name: "mom"
     sync_target: 9
+    sync_interval: 600  # Auto-sync every 10 minutes
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "mom@family.com"
     sync_password: "password2"
@@ -67,6 +69,7 @@ users:
     
   - name: "son"
     sync_target: 9
+    sync_interval: 300  # Auto-sync every 5 minutes
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "son@family.com"
     sync_password: "password3"
@@ -74,11 +77,33 @@ users:
     
   - name: "daughter"
     sync_target: 9
+    # sync_interval not set - uses default 300 seconds (5 minutes)
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "daughter@family.com"
     sync_password: "password4"
     locale: "en_US"
 ```
+
+### Automatic Synchronization
+
+Each user can have automatic background synchronization configured via `sync_interval`:
+
+- **Range:** 60-3600 seconds (1 minute to 1 hour)
+- **Default:** 300 seconds (5 minutes) if not specified
+- **Disable:** Set to `0` to disable auto-sync for specific user
+
+```yaml
+users:
+  - name: "user1"
+    sync_interval: 180  # Every 3 minutes
+    # ... other config ...
+    
+  - name: "user2"
+    sync_interval: 0    # Disabled, manual sync only
+    # ... other config ...
+```
+
+Auto-sync runs independently for each user and doesn't block the API.
 
 ### Minimal Configuration
 

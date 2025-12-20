@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2025-12-21
+
+### Added
+- **Automatic synchronization** for multi-tenant mode
+- Each user can configure individual `sync_interval` (60-3600 seconds)
+- Auto-sync runs in background using threading.Timer
+- Graceful shutdown of sync timers on exit
+
+### Changed
+- Auto-sync is managed by Management API (port 41186)
+- Default sync interval: 300 seconds (5 minutes)
+- Set `sync_interval: 0` to disable auto-sync for specific user
+
+### Technical
+- Added `schedule_auto_sync()` function for per-user timers
+- Added `stop_auto_sync()` and `stop_all_auto_sync()` cleanup functions
+- Auto-sync timers tracked in global `sync_timers` dict
+- Restored functionality from v1.0.x single-tenant mode
+
 ## [2.1.5] - 2025-12-21
 
 ### Fixed

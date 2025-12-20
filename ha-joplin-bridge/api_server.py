@@ -20,11 +20,17 @@ config = {
     "mode": "single",  # "single" or "multi"
     "users": [],  # List of user configurations
     "token_map": {},  # Maps token -> user profile
-    "version": "2.1.5",
+    "version": "2.2.0",
 }
 
 # Global variable for sync tracking per user
 sync_status = {}  # profile_name -> {running, last_sync, error, output}
+
+# Global variable for sync timers per user
+sync_timers = {}  # profile_name -> threading.Timer
+
+# Global variable for sync timers per user
+sync_timers = {}  # profile_name -> threading.Timer
 
 
 def load_configuration():
@@ -261,6 +267,53 @@ def background_sync(profile_name: str):
         sync_status[profile_name]["error"] = str(e)
 
 
+def schedule_auto_sync(profile_name: str, interval: int):
+    """Schedule automatic synchronization for a profile"""
+    if interval <= 0:
+        app.logger.info(f"Auto-sync disabled for {profile_name} (interval: {interval})")
+        return
+
+    app.logger.info(f"Scheduling auto-sync for {profile_name} every {interval} seconds")
+
+    def auto_sync_wrapper():
+        """Wrapper to run sync and reschedule"""
+        app.logger.info(f"Auto-sync triggered for {profile_name}")
+        
+        # Run sync in background thread
+        sync_thread = threading.Thread(target=background_sync, args=(profile_name,))
+        sync_thread.daemon = True
+        sync_thread.start()
+        
+        # Reschedule next sync
+        schedule_auto_sync(profile_name, interval)
+
+    # Cancel existing timer if any
+    if profile_name in sync_timers and sync_timers[profile_name]:
+        sync_timers[profile_name].cancel()
+
+    # Schedule new timer
+    timer = threading.Timer(interval, auto_sync_wrapper)
+    timer.daemon = True
+    timer.start()
+    sync_timers[profile_name] = timer
+    app.logger.info(f"Auto-sync timer started for {profile_name}")
+
+
+def stop_auto_sync(profile_name: str):
+    """Stop automatic synchronization for a profile"""
+    if profile_name in sync_timers and sync_timers[profile_name]:
+        sync_timers[profile_name].cancel()
+        sync_timers[profile_name] = None
+        app.logger.info(f"Auto-sync stopped for {profile_name}")
+
+
+def stop_all_auto_sync():
+    """Stop all automatic synchronization timers"""
+    for profile_name in list(sync_timers.keys()):
+        stop_auto_sync(profile_name)
+
+
+
 # ============================================================================
 # Management API Endpoints (Port 41186)
 # ============================================================================
@@ -490,5 +543,22 @@ if __name__ == "__main__":
     except OSError as e:
         print(f"Port {port} is not available: {e}")
 
+    # Start auto-sync for Management API only
+    if port == 41186:
+        print("Starting auto-sync for all users...")
+        for user in config["users"]:
+            profile_name = user["name"]
+            sync_interval = user.get("sync_interval", 300)  # Default 5 minutes
+            if sync_interval > 0:
+                print(f"  - {profile_name}: every {sync_interval} seconds")
+                schedule_auto_sync(profile_name, sync_interval)
+            else:
+                print(f"  - {profile_name}: disabled (interval: {sync_interval})")
+
     host = "0.0.0.0"  # nosec B104 - controlled environment
+    
+    # Setup cleanup on exit
+    import atexit
+    atexit.register(stop_all_auto_sync)
+    
     serve(app, host=host, port=port, threads=4)
