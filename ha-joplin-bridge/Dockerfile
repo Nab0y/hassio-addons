@@ -1,7 +1,7 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-# Install dependencies
+# Install system dependencies first
 RUN apk add --no-cache \
     nodejs \
     npm \
@@ -10,7 +10,10 @@ RUN apk add --no-cache \
     jq \
     tzdata \
     socat \
-    python3 \
+    python3
+
+# Install Python packages separately to avoid busybox trigger issues
+RUN apk add --no-cache \
     py3-flask \
     py3-waitress
 
