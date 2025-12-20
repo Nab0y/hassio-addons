@@ -1,6 +1,6 @@
 name: "HA Joplin Bridge"
-description: "Bridge between Home Assistant and Joplin with Web Clipper API support"
-version: "1.2.0"
+description: "Bridge between Home Assistant and Joplin with Web Clipper API support (Multi-Tenant)"
+version: "2.0.0"
 slug: ha-joplin-bridge
 url: "https://github.com/Nab0y/hassio-addons/tree/main/ha-joplin-bridge"
 arch:
@@ -22,6 +22,7 @@ ports_description:
   41185/tcp: "Joplin Data API (Web Clipper)"
   41186/tcp: "Management API"
 options:
+  # Legacy single-user mode (deprecated, use users array instead)
   sync_target: 0
   sync_interval: 300
   locale: "en_GB"
@@ -31,6 +32,8 @@ options:
   sync_server_url: ""
   sync_username: ""
   sync_password: ""
+  # Multi-user mode
+  users: []
 schema:
   sync_target: "list(0|5|8|9)"
   sync_interval: "int(60,3600)"
@@ -41,4 +44,15 @@ schema:
   sync_server_url: "str?"
   sync_username: "str?"
   sync_password: "password?"
+  users:
+    - name: "str"
+      sync_target: "list(0|5|8|9)"
+      sync_interval: "int(60,3600)?"
+      locale: "str?"
+      timezone: "str?"
+      enable_encryption: "bool?"
+      encryption_password: "password?"
+      sync_server_url: "str?"
+      sync_username: "str?"
+      sync_password: "password?"
 image: "ghcr.io/nab0y/{arch}-addon-ha-joplin-bridge"

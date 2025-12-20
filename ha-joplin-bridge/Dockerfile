@@ -14,8 +14,8 @@ RUN apk add --no-cache --no-scripts \
     py3-pip \
     py3-flask
 
-# Install waitress via pip to avoid apk trigger issues
-RUN pip3 install --no-cache-dir --break-system-packages waitress
+# Install Python packages via pip to avoid apk trigger issues
+RUN pip3 install --no-cache-dir --break-system-packages waitress requests
 
 # Create user
 RUN addgroup -g 1000 joplin && \

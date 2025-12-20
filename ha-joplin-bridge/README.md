@@ -2,7 +2,7 @@
 
 ![Supports aarch64 Architecture](https://img.shields.io/badge/aarch64-yes-green.svg)
 ![Supports amd64 Architecture](https://img.shields.io/badge/amd64-yes-green.svg)
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![AI Assisted](https://img.shields.io/badge/AI%20assisted-🤖-purple.svg)
 
 Bridge between Home Assistant and Joplin with Web Clipper API support.
@@ -13,6 +13,7 @@ Bridge between Home Assistant and Joplin with full API support for creating auto
 
 - 🌐 **Web Clipper API** (Port 41185) - Full Joplin REST API for notes, notebooks, and tags
 - 🔧 **Management API** (Port 41186) - Sync control, health monitoring, system information
+- 👥 **Multi-Tenant Support** ⭐NEW⭐ - Multiple users, each with their own Joplin account
 - 🔄 **Multi-Service Sync** - Joplin Server, Nextcloud, S3, and local filesystem
 - 📝 **HA Automation Ready** - REST commands and sensors for seamless integration
 - 🔒 **Encryption Support** - Optional end-to-end encryption for sensitive data
@@ -50,7 +51,36 @@ For advanced users, copy the `ha-joplin-bridge` folder to your Home Assistant ad
 
 ## Configuration
 
-### Quick Setup Examples
+### 👥 Multi-Tenant Mode (NEW in v2.0)
+
+**Support multiple users, each with their own Joplin account!**
+
+```yaml
+users:
+  - name: "papa"
+    sync_target: 9
+    sync_server_url: "https://joplin.yourdomain.com"
+    sync_username: "papa@family.com"
+    sync_password: "password1"
+    locale: "ru_RU"
+    
+  - name: "mama"
+    sync_target: 9
+    sync_server_url: "https://joplin.yourdomain.com"
+    sync_username: "mama@family.com"
+    sync_password: "password2"
+    locale: "ru_RU"
+    
+  - name: "son"
+    sync_target: 9
+    sync_server_url: "https://joplin.yourdomain.com"
+    sync_username: "son@family.com"
+    sync_password: "password3"
+```
+
+📖 **[Full Multi-Tenant Documentation](MULTI_TENANT.md)** - Complete guide with examples
+
+### Quick Setup Examples (Single-User Legacy Mode)
 
 #### Joplin Server
 ```yaml

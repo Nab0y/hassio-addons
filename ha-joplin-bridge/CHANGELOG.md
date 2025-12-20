@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2025-12-20
+
+### 🎉 Major Release: Multi-Tenant Support
+
+#### Added
+- **Multi-Tenant Mode** - Support for multiple users, each with their own Joplin account
+- Smart Token Routing - Automatic routing of API requests based on user token
+- Individual user profiles with isolated data storage
+- Per-user synchronization control and status monitoring
+- Dynamic Joplin CLI instance management (one per user)
+- Comprehensive multi-tenant documentation with examples
+- Token mapping system for automatic profile detection
+- Support for up to 10 concurrent users
+
+#### Changed
+- API server now runs two instances:
+  - Management API (port 41186) - unchanged
+  - Smart Proxy (port 41185) - new intelligent routing layer
+- Configuration schema extended with `users` array
+- Token endpoint now returns all user tokens in multi-tenant mode
+- Info endpoint shows mode and user list
+- Enhanced sync endpoints with profile parameter support
+
+#### Technical
+- Added `requests` library for internal proxy communication
+- Multiple Joplin CLI instances on sequential ports (41184, 41185, etc.)
+- Profile-based data isolation in `/data/joplin/profiles/`
+- Backward compatible with single-user (legacy) mode
+- Smart token-to-profile mapping with caching
+
+#### Documentation
+- New MULTI_TENANT.md with complete setup guide
+- Multi-user automation examples
+- Voice notes per user examples
+- Family event logging examples
+- Migration guide from v1.x to v2.0
+- Lovelace dashboard examples
+
+### Backward Compatibility
+- Fully backward compatible with v1.x configuration
+- Legacy single-user mode still supported when `users` array is empty
+- Existing automations continue to work without changes
+
 ## [1.2.0] - 2025-12-20
 
 ### Changed
