@@ -104,6 +104,11 @@ start_joplin_server() {
     local PORT=$3
     
     log "Starting Joplin server for $PROFILE_NAME on localhost:$PORT..."
+    
+    # Configure the port in Joplin config before starting server
+    su joplin -c "export HOME=$PROFILE_DIR; export JOPLIN_PROFILE=$PROFILE_DIR/.config/joplin; cd $PROFILE_DIR; joplin config api.port $PORT 2>/dev/null || true"
+    
+    # Start server
     su joplin -c "export HOME=$PROFILE_DIR; export JOPLIN_PROFILE=$PROFILE_DIR/.config/joplin; cd $PROFILE_DIR; joplin server start --port $PORT --host 127.0.0.1" &
     local PID=$!
     JOPLIN_PIDS+=($PID)
