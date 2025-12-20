@@ -175,8 +175,11 @@ def get_profile_from_token(token: str) -> Optional[str]:
 def proxy_to_joplin(profile_name: str, path: str, method: str, data=None) -> Response:
     """Proxy request to specific Joplin instance"""
     try:
+        print(f"[PROXY] Getting port for profile: {profile_name}")
         port = get_profile_port(profile_name)
+        print(f"[PROXY] Port: {port}")
         url = f"http://127.0.0.1:{port}{path}"
+        print(f"[PROXY] URL: {url}")
 
         app.logger.info(
             f"Proxying {method} {path} to profile {profile_name} on port {port}"
@@ -204,6 +207,16 @@ def proxy_to_joplin(profile_name: str, path: str, method: str, data=None) -> Res
         return Response(
             json.dumps({"error": f"Failed to proxy request: {str(e)}"}),
             status=502,
+            content_type="application/json",
+        )
+    except Exception as e:
+        import traceback
+
+        app.logger.error(f"Unexpected proxy error: {e}")
+        app.logger.error(traceback.format_exc())
+        return Response(
+            json.dumps({"error": f"Internal error: {str(e)}"}),
+            status=500,
             content_type="application/json",
         )
 
