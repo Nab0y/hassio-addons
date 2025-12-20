@@ -71,56 +71,51 @@ configure_joplin_profile() {
     local PROFILE_NAME=$1
     local PROFILE_DIR=$2
     local PORT=$3
-    local USER_CONFIG=$4
+    local USER_SYNC_TARGET=$4
+    local USER_SYNC_INTERVAL=$5
+    local USER_LOCALE=$6
+    local USER_SYNC_URL=$7
+    local USER_SYNC_USERNAME=$8
+    local USER_SYNC_PASSWORD=$9
     
     log "Configuring Joplin profile: $PROFILE_NAME on port $PORT"
-    
-    # Extract user configuration
-    local USER_SYNC_TARGET=$(echo "$USER_CONFIG" | jq -r '.sync_target // 0')
-    local USER_SYNC_INTERVAL=$(echo "$USER_CONFIG" | jq -r '.sync_interval // 300')
-    local USER_LOCALE=$(echo "$USER_CONFIG" | jq -r '.locale // "en_GB"')
-    local USER_SYNC_URL=$(echo "$USER_CONFIG" | jq -r '.sync_server_url // ""')
-    local USER_SYNC_USERNAME=$(echo "$USER_CONFIG" | jq -r '.sync_username // ""')
-    local USER_SYNC_PASSWORD=$(echo "$USER_CONFIG" | jq -r '.sync_password // ""')
-    local USER_ENCRYPTION=$(echo "$USER_CONFIG" | jq -r '.enable_encryption // false')
-    local USER_ENCRYPTION_PASS=$(echo "$USER_CONFIG" | jq -r '.encryption_password // ""')
     
     # Create profile directory
     mkdir -p "$PROFILE_DIR"
     chown -R joplin:joplin "$PROFILE_DIR" 2>/dev/null || true
     
     # Configure Joplin as joplin user
-    su joplin -c "
-export HOME=$PROFILE_DIR
-export JOPLIN_PROFILE=$PROFILE_DIR/.config/joplin
-cd $PROFILE_DIR
+    su joplin -c '
+export HOME='"$PROFILE_DIR"'
+export JOPLIN_PROFILE='"$PROFILE_DIR"'/.config/joplin
+cd '"$PROFILE_DIR"'
 
-echo \"[$(date +'%Y-%m-%d %H:%M:%S')] Configuring $PROFILE_NAME...\"
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Configuring '"$PROFILE_NAME"'..."
 
 # Create basic Joplin config
-joplin config locale \"$USER_LOCALE\" 2>/dev/null || true
-joplin config sync.target $USER_SYNC_TARGET 2>/dev/null || true
-joplin config sync.interval $USER_SYNC_INTERVAL 2>/dev/null || true
+joplin config locale "'"$USER_LOCALE"'" 2>/dev/null || true
+joplin config sync.target '"$USER_SYNC_TARGET"' 2>/dev/null || true
+joplin config sync.interval '"$USER_SYNC_INTERVAL"' 2>/dev/null || true
 
 # Configure sync if needed
-if [ $USER_SYNC_TARGET -ne 0 ] && [ \"$USER_SYNC_URL\" != \"null\" ] && [ -n \"$USER_SYNC_URL\" ]; then
-    echo \"[$(date +'%Y-%m-%d %H:%M:%S')] Setting up sync for $PROFILE_NAME (target $USER_SYNC_TARGET)...\"
-    if [ $USER_SYNC_TARGET -eq 9 ]; then
-        joplin config sync.9.path \"$USER_SYNC_URL\" 2>/dev/null || true
-        [ \"$USER_SYNC_USERNAME\" != \"null\" ] && [ -n \"$USER_SYNC_USERNAME\" ] && joplin config sync.9.username \"$USER_SYNC_USERNAME\" 2>/dev/null || true
-        [ \"$USER_SYNC_PASSWORD\" != \"null\" ] && [ -n \"$USER_SYNC_PASSWORD\" ] && joplin config sync.9.password \"$USER_SYNC_PASSWORD\" 2>/dev/null || true
-    elif [ $USER_SYNC_TARGET -eq 5 ]; then
-        joplin config sync.5.path \"$USER_SYNC_URL\" 2>/dev/null || true
-        [ \"$USER_SYNC_USERNAME\" != \"null\" ] && [ -n \"$USER_SYNC_USERNAME\" ] && joplin config sync.5.username \"$USER_SYNC_USERNAME\" 2>/dev/null || true
-        [ \"$USER_SYNC_PASSWORD\" != \"null\" ] && [ -n \"$USER_SYNC_PASSWORD\" ] && joplin config sync.5.password \"$USER_SYNC_PASSWORD\" 2>/dev/null || true
-    elif [ $USER_SYNC_TARGET -eq 8 ]; then
-        joplin config sync.8.path \"$USER_SYNC_URL\" 2>/dev/null || true
-        [ \"$USER_SYNC_USERNAME\" != \"null\" ] && [ -n \"$USER_SYNC_USERNAME\" ] && joplin config sync.8.accessKeyId \"$USER_SYNC_USERNAME\" 2>/dev/null || true
-        [ \"$USER_SYNC_PASSWORD\" != \"null\" ] && [ -n \"$USER_SYNC_PASSWORD\" ] && joplin config sync.8.secretAccessKey \"$USER_SYNC_PASSWORD\" 2>/dev/null || true
+if [ '"$USER_SYNC_TARGET"' -ne 0 ] && [ "'"$USER_SYNC_URL"'" != "null" ] && [ -n "'"$USER_SYNC_URL"'" ]; then
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Setting up sync for '"$PROFILE_NAME"' (target '"$USER_SYNC_TARGET"')..."
+    if [ '"$USER_SYNC_TARGET"' -eq 9 ]; then
+        joplin config sync.9.path "'"$USER_SYNC_URL"'" 2>/dev/null || true
+        [ "'"$USER_SYNC_USERNAME"'" != "null" ] && [ -n "'"$USER_SYNC_USERNAME"'" ] && joplin config sync.9.username "'"$USER_SYNC_USERNAME"'" 2>/dev/null || true
+        [ "'"$USER_SYNC_PASSWORD"'" != "null" ] && [ -n "'"$USER_SYNC_PASSWORD"'" ] && joplin config sync.9.password "'"$USER_SYNC_PASSWORD"'" 2>/dev/null || true
+    elif [ '"$USER_SYNC_TARGET"' -eq 5 ]; then
+        joplin config sync.5.path "'"$USER_SYNC_URL"'" 2>/dev/null || true
+        [ "'"$USER_SYNC_USERNAME"'" != "null" ] && [ -n "'"$USER_SYNC_USERNAME"'" ] && joplin config sync.5.username "'"$USER_SYNC_USERNAME"'" 2>/dev/null || true
+        [ "'"$USER_SYNC_PASSWORD"'" != "null" ] && [ -n "'"$USER_SYNC_PASSWORD"'" ] && joplin config sync.5.password "'"$USER_SYNC_PASSWORD"'" 2>/dev/null || true
+    elif [ '"$USER_SYNC_TARGET"' -eq 8 ]; then
+        joplin config sync.8.path "'"$USER_SYNC_URL"'" 2>/dev/null || true
+        [ "'"$USER_SYNC_USERNAME"'" != "null" ] && [ -n "'"$USER_SYNC_USERNAME"'" ] && joplin config sync.8.accessKeyId "'"$USER_SYNC_USERNAME"'" 2>/dev/null || true
+        [ "'"$USER_SYNC_PASSWORD"'" != "null" ] && [ -n "'"$USER_SYNC_PASSWORD"'" ] && joplin config sync.8.secretAccessKey "'"$USER_SYNC_PASSWORD"'" 2>/dev/null || true
     fi
-    echo \"[$(date +'%Y-%m-%d %H:%M:%S')] Sync configuration completed for $PROFILE_NAME\"
+    echo "[$(date +"%Y-%m-%d %H:%M:%S")] Sync configuration completed for '"$PROFILE_NAME"'"
 fi
-"
+'
 }
 
 # Function to start Joplin server
@@ -143,7 +138,7 @@ if [ "$MODE" = "single" ]; then
     log "Starting in single-user mode (legacy)"
     
     # Configure single profile
-    configure_joplin_profile "default" "/data/joplin" 41184 "{\"sync_target\":$SYNC_TARGET,\"sync_interval\":$SYNC_INTERVAL,\"locale\":\"$LOCALE\",\"sync_server_url\":\"$SYNC_SERVER_URL\",\"sync_username\":\"$SYNC_USERNAME\",\"sync_password\":\"$SYNC_PASSWORD\"}"
+    configure_joplin_profile "default" "/data/joplin" 41184 "$SYNC_TARGET" "$SYNC_INTERVAL" "$LOCALE" "$SYNC_SERVER_URL" "$SYNC_USERNAME" "$SYNC_PASSWORD"
     
     # Start single Joplin instance
     start_joplin_server "default" "/data/joplin" 41184
@@ -165,12 +160,18 @@ else
         USER_NAME=$(jq -r ".users[$i].name" /data/options.json)
         PROFILE_DIR="/data/joplin/profiles/$USER_NAME"
         PORT=$((BASE_PORT + i))
-        USER_CONFIG=$(jq -c ".users[$i]" /data/options.json)
+        
+        USER_SYNC_TARGET=$(jq -r ".users[$i].sync_target // 0" /data/options.json)
+        USER_SYNC_INTERVAL=$(jq -r ".users[$i].sync_interval // 300" /data/options.json)
+        USER_LOCALE=$(jq -r ".users[$i].locale // \"en_GB\"" /data/options.json)
+        USER_SYNC_URL=$(jq -r ".users[$i].sync_server_url // \"\"" /data/options.json)
+        USER_SYNC_USERNAME=$(jq -r ".users[$i].sync_username // \"\"" /data/options.json)
+        USER_SYNC_PASSWORD=$(jq -r ".users[$i].sync_password // \"\"" /data/options.json)
         
         log "Setting up user $((i+1))/$USERS_COUNT: $USER_NAME"
         
         # Configure profile
-        configure_joplin_profile "$USER_NAME" "$PROFILE_DIR" "$PORT" "$USER_CONFIG"
+        configure_joplin_profile "$USER_NAME" "$PROFILE_DIR" "$PORT" "$USER_SYNC_TARGET" "$USER_SYNC_INTERVAL" "$USER_LOCALE" "$USER_SYNC_URL" "$USER_SYNC_USERNAME" "$USER_SYNC_PASSWORD"
         
         # Start Joplin server
         start_joplin_server "$USER_NAME" "$PROFILE_DIR" "$PORT"
