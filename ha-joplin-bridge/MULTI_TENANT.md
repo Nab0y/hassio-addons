@@ -17,6 +17,7 @@ Version 2.0.0 adds **multi-tenant** mode support, allowing multiple Home Assista
          │  Smart Proxy (Port 41185)     │
          │  - Automatic routing           │
          │  - Token-based profile mapping │
+         │  - ONE port for ALL users      │
          └───────┬───────────────────────┘
                  │
     ┌────────────┼────────────┬────────────┐
@@ -26,9 +27,19 @@ Version 2.0.0 adds **multi-tenant** mode support, allowing multiple Home Assista
 │ Joplin  ││ Joplin  ││ Joplin  ││ Joplin  │
 │ CLI     ││ CLI     ││ CLI     ││ CLI     │
 │ User1   ││ User2   ││ User3   ││ User4   │
-│ :41184  ││ :41185  ││ :41186  ││ :41187  │
+│ :41190  ││ :41191  ││ :41192  ││ :41193  │
+│(internal││(internal││(internal││(internal│
+│ only)   ││ only)   ││ only)   ││ only)   │
 └─────────┘└─────────┘└─────────┘└─────────┘
 ```
+
+### Port Allocation
+
+- **Port 41185** - Smart Proxy (Data API) - **ALL users use this port**
+- **Port 41186** - Management API (health, tokens, sync status)
+- **Ports 41190-41199** - Internal Joplin CLI instances (not directly accessible)
+
+**Important:** Users don't access ports 41190+ directly. They all use port 41185 with different tokens!
 
 ## Configuration
 

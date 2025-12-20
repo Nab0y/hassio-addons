@@ -95,7 +95,7 @@ users:
 
 #### Technical
 - Added `requests` library for internal proxy communication
-- Multiple Joplin CLI instances on sequential ports (41184, 41185, etc.)
+- Multiple Joplin CLI instances on sequential ports (41190, 41191, 41192, etc.)
 - Profile-based data isolation in `/data/joplin/profiles/`
 - Backward compatible with single-user (legacy) mode
 - Smart token-to-profile mapping with caching
@@ -176,8 +176,9 @@ users:
 
 ### Added
 - Initial release of HA Joplin Bridge for Home Assistant
-- Web Clipper API on ports 41184 and 41185  
+- Web Clipper API on port 41185  
 - Management API on port 41186
+- Joplin CLI instances on ports 41190+
 - Support for all Joplin sync types
 - Automatic sync configuration from add-on settings
 - Real-time sync status monitoring
