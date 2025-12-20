@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] - 2025-12-21
+
+### Fixed
+- Management API startup log now shows auto-sync configuration
+- Increased startup delay to 3 seconds for proper initialization
+- Full log output displayed in container logs instead of truncated
+
 ## [2.2.0] - 2025-12-21
 
 ### Added

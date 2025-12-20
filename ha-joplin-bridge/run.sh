@@ -155,8 +155,8 @@ python3 /api_server.py > /tmp/mgmt_api.log 2>&1 &
 MGMT_API_PID=$!
 log "Management API PID: $MGMT_API_PID"
 
-# Give it a moment to start
-sleep 2
+# Give it a moment to start and initialize auto-sync
+sleep 3
 
 # Check if it's still running
 if ! kill -0 "$MGMT_API_PID" 2>/dev/null; then
@@ -166,8 +166,8 @@ if ! kill -0 "$MGMT_API_PID" 2>/dev/null; then
     exit 1
 else
     log "Management API started successfully"
-    # Show first few lines of output
-    head -n 10 /tmp/mgmt_api.log 2>/dev/null || true
+    # Show startup output including auto-sync configuration
+    cat /tmp/mgmt_api.log 2>/dev/null || true
 fi
 
 log "Starting Joplin Data API Proxy on port 41185..."
