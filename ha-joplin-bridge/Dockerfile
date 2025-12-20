@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     tzdata \
     socat \
     python3 \
-    py3-flask
+    py3-flask \
+    py3-waitress
 
 # Create user
 RUN addgroup -g 1000 joplin && \

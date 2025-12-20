@@ -103,7 +103,7 @@ def health_check():
             "status": "healthy",
             "joplin_api_available": True,
             "sync_running": sync_status["running"],
-            "addon_version": "1.1.0",
+            "addon_version": "1.2.0",
         }
     )
 
@@ -203,7 +203,7 @@ def get_info():
     return jsonify(
         {
             "success": True,
-            "addon_version": "1.1.0",
+            "addon_version": "1.2.0",
             "joplin_version": "CLI",
             "status": (
                 status_result["stdout"] if status_result["success"] else "Unknown"
@@ -224,6 +224,7 @@ def get_info():
 
 if __name__ == "__main__":
     import socket
+    from waitress import serve
 
     # Check if port is available
     try:
@@ -235,7 +236,7 @@ if __name__ == "__main__":
         print(f"Port 41186 is not available: {e}")
 
     # Bind to all interfaces for container networking
-    print("Starting Flask server on 0.0.0.0:41186")
+    print("Starting production WSGI server on 0.0.0.0:41186")
     # Using 0.0.0.0 is safe in container environment
     host = "0.0.0.0"  # nosec B104 - controlled environment
-    app.run(host=host, port=41186, debug=False)
+    serve(app, host=host, port=41186, threads=4)

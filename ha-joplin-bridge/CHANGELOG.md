@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2025-12-20
+
+### Changed
+- Replaced Flask development server with Waitress production WSGI server
+- Improved API server stability and performance
+- Added multi-threaded request handling (4 threads)
+
+### Technical
+- Added `py3-waitress` dependency to Dockerfile
+- Updated API server startup to use production-ready WSGI server
+- Removed Flask development server warning
+
 ## [1.1.0] - 2024-12-04
 
 ### Changed
