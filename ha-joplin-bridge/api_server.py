@@ -36,7 +36,9 @@ def load_configuration():
         users = options.get("users", [])
 
         if len(users) == 0:
-            app.logger.error("No users configured! Please add users array to configuration.")
+            app.logger.error(
+                "No users configured! Please add users array to configuration."
+            )
             return False
 
         config["mode"] = "multi"
@@ -337,7 +339,7 @@ def sync_status_endpoint():
 def get_info():
     """Get Joplin information"""
     profile_name = request.args.get("profile", None)
-    
+
     if not profile_name and len(config["users"]) > 0:
         profile_name = config["users"][0]["name"]
 
