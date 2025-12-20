@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] - 2025-12-21
+
+### Fixed
+- **CRITICAL:** Changed Joplin CLI base port from 41184 to 41190 to avoid port conflicts
+- Second user would have conflicted with Smart Proxy on port 41185
+- Third user would have conflicted with Management API on port 41186
+
+### Technical
+- Joplin CLI instances now use ports 41190, 41191, 41192, etc.
+- Ports 41185 (Smart Proxy) and 41186 (Management API) are now reserved
+
 ## [2.1.1] - 2025-12-21
 
 ### Fixed
