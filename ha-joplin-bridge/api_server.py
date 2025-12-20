@@ -76,9 +76,11 @@ def get_profile_dir(profile_name: str) -> str:
 def get_profile_port(profile_name: str) -> int:
     """Get Joplin server port for a profile"""
     # Find user index and calculate port
+    # Ports 41185 and 41186 are reserved for API servers
+    # So we use 41190+ for Joplin CLI instances
     for idx, user in enumerate(config["users"]):
         if user["name"] == profile_name:
-            return 41184 + idx
+            return 41190 + idx
 
     raise ValueError(f"Profile {profile_name} not found")
 

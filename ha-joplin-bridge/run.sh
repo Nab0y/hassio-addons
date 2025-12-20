@@ -114,7 +114,9 @@ start_joplin_server() {
 log "Starting in multi-user mode with $USERS_COUNT users"
 
 # Start Joplin instances for each user
-BASE_PORT=41184
+# Ports 41185 and 41186 are reserved for API servers
+# So we use 41190+ for Joplin CLI instances
+BASE_PORT=41190
 
 for ((i=0; i<$USERS_COUNT; i++)); do
     USER_NAME=$(jq -r ".users[$i].name" /data/options.json)
