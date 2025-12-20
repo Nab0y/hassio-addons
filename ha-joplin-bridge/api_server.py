@@ -11,7 +11,7 @@ import json
 import threading
 import requests
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 
 app = Flask(__name__)
 
