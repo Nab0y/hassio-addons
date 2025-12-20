@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.3] - 2025-12-21
+
+### Fixed
+- **CRITICAL:** Joplin CLI now correctly uses configured port via `api.port` config
+- Added explicit `joplin config api.port` before starting server
+- Joplin CLI was ignoring --port parameter and using default 41184
+
 ## [2.1.2] - 2025-12-21
 
 ### Fixed
