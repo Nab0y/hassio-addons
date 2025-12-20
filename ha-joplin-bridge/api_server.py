@@ -38,7 +38,9 @@ def load_configuration():
         print(f"Found {len(users)} users in configuration")
 
         if len(users) == 0:
-            print("ERROR: No users configured! Please add users array to configuration.")
+            print(
+                "ERROR: No users configured! Please add users array to configuration."
+            )
             return False
 
         config["mode"] = "multi"
@@ -60,6 +62,7 @@ def load_configuration():
         return True
     except Exception as e:
         import traceback
+
         print(f"FATAL ERROR loading configuration: {e}")
         traceback.print_exc()
         return False
