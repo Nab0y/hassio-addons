@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2025-12-21
+
+### Fixed
+- Added verbose logging to API server startup for better debugging
+- Added startup health checks for API servers with error reporting
+- Improved error messages in configuration loading
+
+### Technical
+- Redirected stderr to stdout for Python processes
+- Added traceback output for configuration loading errors
+- Added process health checks after API server startup
+
 ## [2.1.0] - 2025-12-21
 
 ### Breaking Changes
