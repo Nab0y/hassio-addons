@@ -183,16 +183,21 @@ else
     sleep 10
 fi
 
-# Start both API servers
+# Start API servers
 log "Starting Management API server on port 41186..."
 python3 /api_server.py &
 MGMT_API_PID=$!
 log "Management API PID: $MGMT_API_PID"
 
-log "Starting Joplin Data API Proxy on port 41185..."
-python3 /api_server.py --data-api &
-DATA_API_PID=$!
-log "Data API Proxy PID: $DATA_API_PID"
+if [ "$MODE" = "multi" ]; then
+    log "Starting Joplin Data API Proxy on port 41185..."
+    python3 /api_server.py --data-api &
+    DATA_API_PID=$!
+    log "Data API Proxy PID: $DATA_API_PID"
+else
+    log "Single-user mode: using socat proxy on port 41185"
+    DATA_API_PID="N/A"
+fi
 
 log "All services started successfully"
 log "Mode: $MODE"
@@ -210,7 +215,9 @@ log "Data API Proxy PID: $DATA_API_PID"
 cleanup() {
     log "Shutting down services..."
     kill "$MGMT_API_PID" 2>/dev/null || true
-    kill "$DATA_API_PID" 2>/dev/null || true
+    if [ "$DATA_API_PID" != "N/A" ]; then
+        kill "$DATA_API_PID" 2>/dev/null || true
+    fi
     for pid in "${SOCAT_PIDS[@]}"; do
         kill "$pid" 2>/dev/null || true
     done
@@ -233,9 +240,11 @@ while true; do
         break
     fi
     
-    if ! kill -0 "$DATA_API_PID" 2>/dev/null; then
-        log "ERROR: Data API Proxy stopped!"
-        break
+    if [ "$MODE" = "multi" ] && [ "$DATA_API_PID" != "N/A" ]; then
+        if ! kill -0 "$DATA_API_PID" 2>/dev/null; then
+            log "ERROR: Data API Proxy stopped!"
+            break
+        fi
     fi
     
     # Check Joplin processes
