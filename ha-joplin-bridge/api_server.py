@@ -30,20 +30,20 @@ sync_status = {}  # profile_name -> {running, last_sync, error, output}
 def load_configuration():
     """Load configuration from /data/options.json"""
     try:
+        print("Loading configuration from /data/options.json...")
         with open("/data/options.json", "r") as f:
             options = json.load(f)
 
         users = options.get("users", [])
+        print(f"Found {len(users)} users in configuration")
 
         if len(users) == 0:
-            app.logger.error(
-                "No users configured! Please add users array to configuration."
-            )
+            print("ERROR: No users configured! Please add users array to configuration.")
             return False
 
         config["mode"] = "multi"
         config["users"] = users
-        app.logger.info(f"Multi-tenant mode: {len(users)} users configured")
+        print(f"Multi-tenant mode: {len(users)} users configured")
 
         # Initialize sync status for each user
         for user in config["users"]:
@@ -54,10 +54,14 @@ def load_configuration():
                 "error": None,
                 "output": None,
             }
+            print(f"Initialized sync status for user: {profile_name}")
 
+        print("Configuration loaded successfully")
         return True
     except Exception as e:
-        app.logger.error(f"Failed to load configuration: {e}")
+        import traceback
+        print(f"FATAL ERROR loading configuration: {e}")
+        traceback.print_exc()
         return False
 
 
