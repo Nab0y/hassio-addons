@@ -20,7 +20,7 @@ config = {
     "mode": "single",  # "single" or "multi"
     "users": [],  # List of user configurations
     "token_map": {},  # Maps token -> user profile
-    "version": "2.1.4",
+    "version": "2.1.5",
 }
 
 # Global variable for sync tracking per user
@@ -198,8 +198,25 @@ def proxy_to_joplin(profile_name: str, path: str, method: str, data=None) -> Res
         else:
             return Response("Method not allowed", status=405)
 
+        print(f"[PROXY] Response status: {resp.status_code}")
+        print(f"[PROXY] Response headers: {dict(resp.headers)}")
+        print(f"[PROXY] Response content length: {len(resp.content)}")
+
+        # Filter out problematic headers that Flask/waitress will set automatically
+        excluded_headers = {
+            'content-length', 'transfer-encoding', 'connection', 
+            'keep-alive', 'server'
+        }
+        safe_headers = {
+            k: v for k, v in resp.headers.items() 
+            if k.lower() not in excluded_headers
+        }
+
         return Response(
-            resp.content, status=resp.status_code, headers=dict(resp.headers)
+            resp.content,
+            status=resp.status_code,
+            headers=safe_headers,
+            content_type=resp.headers.get('Content-Type', 'application/json')
         )
 
     except requests.exceptions.RequestException as e:
