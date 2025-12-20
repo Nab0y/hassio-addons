@@ -278,12 +278,12 @@ def schedule_auto_sync(profile_name: str, interval: int):
     def auto_sync_wrapper():
         """Wrapper to run sync and reschedule"""
         app.logger.info(f"Auto-sync triggered for {profile_name}")
-        
+
         # Run sync in background thread
         sync_thread = threading.Thread(target=background_sync, args=(profile_name,))
         sync_thread.daemon = True
         sync_thread.start()
-        
+
         # Reschedule next sync
         schedule_auto_sync(profile_name, interval)
 
@@ -311,7 +311,6 @@ def stop_all_auto_sync():
     """Stop all automatic synchronization timers"""
     for profile_name in list(sync_timers.keys()):
         stop_auto_sync(profile_name)
-
 
 
 # ============================================================================
@@ -556,9 +555,10 @@ if __name__ == "__main__":
                 print(f"  - {profile_name}: disabled (interval: {sync_interval})")
 
     host = "0.0.0.0"  # nosec B104 - controlled environment
-    
+
     # Setup cleanup on exit
     import atexit
+
     atexit.register(stop_all_auto_sync)
-    
+
     serve(app, host=host, port=port, threads=4)
