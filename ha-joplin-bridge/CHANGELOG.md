@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2025-12-21
+
+### Breaking Changes
+- **Removed legacy single-user mode** - multi-tenant mode is now the only supported configuration
+- Configuration now requires `users` array - empty configuration will cause addon to fail
+- Simplified codebase by removing backward compatibility layer
+
+### Changed
+- All users now use profile-based storage in `/data/joplin/profiles/<username>`
+- Configuration schema simplified - removed deprecated single-user options
+- API endpoints simplified - no mode switching logic
+
+### Migration from v2.0.x
+If you were using single-user mode, update your configuration:
+```yaml
+# Old (v2.0.x)
+sync_target: 9
+sync_server_url: "https://..."
+# ... other options
+
+# New (v2.1.0+)
+users:
+  - name: "default"
+    sync_target: 9
+    sync_server_url: "https://..."
+    # ... other options
+```
+
 ## [2.0.2] - 2025-12-21
 
 ### Fixed

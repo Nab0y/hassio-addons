@@ -20,7 +20,7 @@ config = {
     "mode": "single",  # "single" or "multi"
     "users": [],  # List of user configurations
     "token_map": {},  # Maps token -> user profile
-    "version": "2.0.2",
+    "version": "2.1.0",
 }
 
 # Global variable for sync tracking per user
