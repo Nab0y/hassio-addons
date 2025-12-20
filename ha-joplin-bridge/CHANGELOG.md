@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.4] - 2025-12-21
+
+### Added
+- Verbose logging to proxy_to_joplin function for debugging
+- General exception handler to catch all proxy errors
+- Print statements for debugging profile/port resolution
+
+### Fixed
+- Better error messages when proxy fails
+- Traceback output for unexpected errors
+
 ## [2.1.3] - 2025-12-21
 
 ### Fixed
