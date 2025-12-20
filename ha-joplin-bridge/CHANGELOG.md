@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2025-12-21
+
+### Fixed
+- Shell quoting issues in run.sh causing addon startup crashes
+- Function parameter passing using proper shell variables instead of JSON strings
+- Heredoc variable expansion in configure_joplin_profile function
+
+### Technical
+- Improved shell script reliability with proper variable escaping
+- Fixed compatibility with older bash versions
+
 ## [2.0.0] - 2025-12-20
 
 ### 🎉 Major Release: Multi-Tenant Support

@@ -2,7 +2,7 @@
 
 ![Supports aarch64 Architecture](https://img.shields.io/badge/aarch64-yes-green.svg)
 ![Supports amd64 Architecture](https://img.shields.io/badge/amd64-yes-green.svg)
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)
 ![AI Assisted](https://img.shields.io/badge/AI%20assisted-🤖-purple.svg)
 
 Bridge between Home Assistant and Joplin with Web Clipper API support.
