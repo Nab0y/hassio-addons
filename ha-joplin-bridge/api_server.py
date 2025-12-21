@@ -27,8 +27,6 @@ config = {
 sync_status = {}  # profile_name -> {running, last_sync, error, output}
 
 
-
-
 def load_configuration():
     """Load configuration from /data/options.json"""
     try:
@@ -493,6 +491,5 @@ if __name__ == "__main__":
         print(f"Port {port} is not available: {e}")
 
     host = "0.0.0.0"  # nosec B104 - controlled environment
-
 
     serve(app, host=host, port=port, threads=4)
