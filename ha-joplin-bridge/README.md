@@ -80,54 +80,21 @@ users:
 
 📖 **[Full Multi-Tenant Documentation](MULTI_TENANT.md)** - Complete guide with examples
 
-### Quick Setup Examples (Single-User Legacy Mode)
+### User Configuration Parameters
 
-#### Joplin Server
-```yaml
-sync_target: 9
-sync_server_url: "https://your-joplin-server.com"
-sync_username: "your-email@example.com"
-sync_password: "your-password"
-enable_encryption: true
-encryption_password: "your-encryption-password"
-```
+Each user in the `users` array supports:
 
-#### Nextcloud/WebDAV
-```yaml
-sync_target: 5
-sync_server_url: "https://cloud.example.com/remote.php/dav/files/username/Joplin"
-sync_username: "your-username"
-sync_password: "your-app-password"
-```
-
-#### S3 Compatible Storage
-```yaml
-sync_target: 8
-sync_server_url: "https://s3.amazonaws.com"
-sync_username: "your-access-key-id"
-sync_password: "your-secret-access-key"
-```
-
-#### Local Only (No Sync)
-```yaml
-sync_target: 0
-locale: "en_GB"
-timezone: "UTC"
-```
-
-### Configuration Options
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `sync_target` | Sync service (0=None, 5=Nextcloud, 8=S3, 9=Joplin Server) | `0` |
-| `sync_server_url` | Server URL for sync service | `""` |
-| `sync_username` | Username for sync service | `""` |
-| `sync_password` | Password for sync service | `""` |
-| `enable_encryption` | Enable end-to-end encryption | `false` |
-| `encryption_password` | Encryption password | `""` |
-| `sync_interval` | Auto-sync interval in seconds | `300` |
-| `locale` | Interface language | `en_GB` |
-| `timezone` | Timezone for timestamps | `UTC` |
+| Parameter | Description | Required |
+|-----------|-------------|----------|
+| `name` | User profile name (unique identifier) | ✅ Yes |
+| `sync_target` | Sync service (0=None, 5=Nextcloud, 8=S3, 9=Joplin Server) | ✅ Yes |
+| `sync_server_url` | Server URL for sync service | Only if sync_target > 0 |
+| `sync_username` | Username for sync service | Only if sync_target > 0 |
+| `sync_password` | Password for sync service | Only if sync_target > 0 |
+| `enable_encryption` | Enable end-to-end encryption | No |
+| `encryption_password` | Encryption password | Only if encryption enabled |
+| `locale` | Interface language (e.g., `en_GB`, `ru_RU`) | No |
+| `timezone` | Timezone (e.g., `UTC`, `Europe/Moscow`) | No |
 
 ## APIs
 
@@ -139,23 +106,41 @@ Control sync, monitor status, and get system information.
 
 ## Quick Start
 
-### Get API Token
+### 1. Get API Tokens for All Users
 ```bash
-curl http://localhost:41186/token
+curl http://192.168.1.42:41186/token
 ```
 
-### Create First Note
+Response:
+```json
+{
+  "success": true,
+  "mode": "multi",
+  "tokens": {
+    "papa": "abc123...",
+    "mama": "def456...",
+    "son": "ghi789..."
+  }
+}
+```
+
+### 2. Create First Note for Specific User
 ```bash
+# Set token for papa
+TOKEN="abc123..."
+
 # Create notebook
-curl -X POST "http://localhost:41185/folders?token=$TOKEN" \
+curl -X POST "http://192.168.1.42:41185/folders?token=$TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title": "Home Assistant Logs"}'
 
 # Create note
-curl -X POST "http://localhost:41185/notes?token=$TOKEN" \
+curl -X POST "http://192.168.1.42:41185/notes?token=$TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title": "Test Note", "body": "Hello from HA!", "parent_id": "FOLDER_ID"}'
 ```
+
+**Note:** Each user uses the **same port 41185** but with their **own unique token**.
 
 ## Home Assistant Integration
 
@@ -163,21 +148,33 @@ curl -X POST "http://localhost:41185/notes?token=$TOKEN" \
 
 ```yaml
 sensor:
-  # API Token
+  # Get all user tokens
   - platform: rest
-    name: joplin_token
-    resource: http://localhost:41186/token
-    value_template: "{{ value_json.token }}"
+    name: joplin_tokens
+    resource: http://192.168.1.42:41186/token
+    value_template: "{{ value_json.mode }}"
+    json_attributes:
+      - tokens
     scan_interval: 3600
     
-  # Sync Status
+  # Sync status for Papa
   - platform: rest
-    name: joplin_sync_status  
-    resource: http://localhost:41186/sync/status
+    name: joplin_sync_papa
+    resource: http://192.168.1.42:41186/sync/status?profile=papa
     value_template: >
       {% if value_json.status.running %}Syncing
       {% elif value_json.status.last_sync %}{{ as_timestamp(value_json.status.last_sync) | timestamp_custom('%d.%m %H:%M') }}
-      {% else %}Never synced{% endif %}
+      {% else %}Never{% endif %}
+    json_attributes: [status]
+    
+  # Sync status for Mama
+  - platform: rest
+    name: joplin_sync_mama
+    resource: http://192.168.1.42:41186/sync/status?profile=mama
+    value_template: >
+      {% if value_json.status.running %}Syncing
+      {% elif value_json.status.last_sync %}{{ as_timestamp(value_json.status.last_sync) | timestamp_custom('%d.%m %H:%M') }}
+      {% else %}Never{% endif %}
     json_attributes: [status]
 ```
 
@@ -185,80 +182,135 @@ sensor:
 
 ```yaml
 rest_command:
-  # Create note
-  joplin_create_note:
-    url: "http://localhost:41185/notes?token={{ states('sensor.joplin_token') }}"
+  # Create note for Papa
+  joplin_create_note_papa:
+    url: "http://192.168.1.42:41185/notes"
     method: POST
     headers:
       Content-Type: "application/json"
-    payload: '{"title": "{{ title }}", "body": "{{ body }}", "parent_id": "{{ folder_id | default(\"\") }}"}'
+    payload: >
+      {
+        "title": "{{ title }}",
+        "body": "{{ body }}",
+        "token": "{{ state_attr('sensor.joplin_tokens', 'tokens')['papa'] }}"
+      }
       
-  # Trigger sync
-  joplin_sync:
-    url: "http://localhost:41186/sync"
+  # Create note for Mama
+  joplin_create_note_mama:
+    url: "http://192.168.1.42:41185/notes"
     method: POST
-    payload: '{"background": true}'
+    headers:
+      Content-Type: "application/json"
+    payload: >
+      {
+        "title": "{{ title }}",
+        "body": "{{ body }}",
+        "token": "{{ state_attr('sensor.joplin_tokens', 'tokens')['mama'] }}"
+      }
+      
+  # Sync for Papa
+  joplin_sync_papa:
+    url: "http://192.168.1.42:41186/sync"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    payload: '{"profile": "papa", "background": true}'
+    
+  # Sync for Mama
+  joplin_sync_mama:
+    url: "http://192.168.1.42:41186/sync"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    payload: '{"profile": "mama", "background": true}'
 ```
 
 ### Example Automations
 
-#### Security Event Logger
+#### Voice Note - Per User
 ```yaml
 automation:
-  - alias: "Log Security Events"
+  # Papa's voice notes
+  - alias: "Create Voice Note - Papa"
+    trigger:
+      - platform: event
+        event_type: voice_note_received
+        event_data:
+          user: papa
+    action:
+      - service: rest_command.joplin_create_note_papa
+        data:
+          title: "🎤 Voice Note - {{ now().strftime('%H:%M') }}"
+          body: "{{ trigger.event.data.text }}"
+          
+  # Mama's voice notes
+  - alias: "Create Voice Note - Mama"
+    trigger:
+      - platform: event
+        event_type: voice_note_received
+        event_data:
+          user: mama
+    action:
+      - service: rest_command.joplin_create_note_mama
+        data:
+          title: "🎤 Voice Note - {{ now().strftime('%H:%M') }}"
+          body: "{{ trigger.event.data.text }}"
+```
+
+#### Auto-Sync Schedule
+```yaml
+automation:
+  # Papa sync every 5 minutes
+  - alias: "Joplin Sync - Papa"
+    trigger:
+      - platform: time_pattern
+        minutes: "/5"
+    action:
+      - service: rest_command.joplin_sync_papa
+      
+  # Mama sync every 10 minutes
+  - alias: "Joplin Sync - Mama"
+    trigger:
+      - platform: time_pattern
+        minutes: "/10"
+    action:
+      - service: rest_command.joplin_sync_mama
+```
+
+#### Security Event - To Specific User
+```yaml
+automation:
+  - alias: "Security Alert - To Papa"
     trigger:
       - platform: state
         entity_id: binary_sensor.front_door
         to: 'on'
     action:
-      - service: rest_command.joplin_create_note
+      - service: rest_command.joplin_create_note_papa
         data:
-          title: "🚨 {{ trigger.to_state.attributes.friendly_name }} - {{ now().strftime('%H:%M') }}"
+          title: "🚨 Door Alert - {{ now().strftime('%H:%M') }}"
           body: |
-            **Event:** Door opened
+            **Event:** Front door opened
             **Time:** {{ now().strftime('%d.%m.%Y at %H:%M:%S') }}
-            **Status:** {{ states('alarm_control_panel.home') }}
-```
-
-#### Weekly Report
-```yaml
-automation:
-  - alias: "Weekly Home Report"
-    trigger:
-      platform: time
-      at: "09:00:00"  
-    condition:
-      condition: time
-      weekday: [sun]
-    action:
-      - service: rest_command.joplin_create_note
-        data:
-          title: "📊 Weekly Report {{ now().strftime('%d.%m.%Y') }}"
-          body: |
-            # Smart Home Summary
-            
-            **Energy:** {{ states('sensor.energy_total') }} kWh
-            **Temperature:** {{ states('sensor.average_temperature') }}°C
-            **Security Events:** {{ states('counter.door_openings') }}
-            
-            *Generated {{ now().strftime('%d.%m.%Y at %H:%M') }}*
+            **Alarm:** {{ states('alarm_control_panel.home') }}
 ```
 
 ## API Reference
 
 ### Management API (Port 41186)
-- `GET /health` - Check add-on health
-- `GET /token` - Get API token  
-- `GET /info` - System information
-- `POST /sync` - Start sync
-- `GET /sync/status` - Sync status
+- `GET /health` - Check add-on health and user count
+- `GET /token` - Get API tokens for all users (multi-tenant mode)
+- `POST /sync` - Start sync for specific user
+  - Body: `{"profile": "username", "background": true}`
+- `GET /sync/status?profile=username` - Get sync status for specific user
 
 ### Joplin Data API (Port 41185)
-- `GET /ping` - Health check
-- `GET/POST /folders` - Notebooks
-- `GET/POST /notes` - Notes
-- `GET/POST /tags` - Tags
-- Authentication: `?token=TOKEN` required
+- All users access via **same port** with different tokens
+- `GET /ping?token=TOKEN` - Health check
+- `GET/POST /folders?token=TOKEN` - Notebooks
+- `GET/POST /notes?token=TOKEN` - Notes
+- `GET/POST /tags?token=TOKEN` - Tags
+- Authentication: `?token=TOKEN` parameter required in all requests
 
 ## Troubleshooting
 

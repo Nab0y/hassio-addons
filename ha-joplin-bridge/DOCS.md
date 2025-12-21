@@ -318,7 +318,6 @@ encryption_password: "your-encryption-password"
 sync_target: 0
 locale: "en_GB"
 timezone: "UTC"
-sync_interval: 300
 ```
 
 ## Home Assistant Integration
