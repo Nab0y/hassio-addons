@@ -1,6 +1,6 @@
 name: "HA Joplin Bridge"
 description: "Bridge between Home Assistant and Joplin with Web Clipper API support (Multi-Tenant)"
-version: "2.2.1"
+version: "3.0.0"
 slug: ha-joplin-bridge
 url: "https://github.com/Nab0y/hassio-addons/tree/main/ha-joplin-bridge"
 arch:
@@ -27,7 +27,6 @@ schema:
   users:
     - name: "str"
       sync_target: "list(0|5|8|9)"
-      sync_interval: "int(60,3600)?"
       locale: "str?"
       timezone: "str?"
       enable_encryption: "bool?"

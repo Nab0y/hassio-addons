@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2025-12-21
+
+### Breaking Changes
+- **Removed built-in auto-sync timers** - sync is now controlled via Home Assistant automations
+- Removed `sync_interval` configuration parameter
+- This change provides more flexibility and control over when sync happens
+
+### Changed
+- Synchronization is now triggered via `/sync` API endpoint from HA automations or Node-RED
+- Users have full control over sync schedule, conditions, and triggers
+- Reduced addon resource usage (no background timers)
+
+### Added
+- Documentation for HA automation-based sync scheduling
+- Examples for time-based, event-based, and Node-RED sync triggers
+- Examples for different sync intervals per user via automations
+
+### Migration Guide
+**Before (v2.x):**
+```yaml
+users:
+  - name: "user1"
+    sync_interval: 300
+```
+
+**After (v3.0.0):**
+```yaml
+# configuration.yaml
+rest_command:
+  joplin_sync_user1:
+    url: "http://192.168.1.42:41186/sync"
+    method: POST
+    payload: '{"profile": "user1", "background": true}'
+
+# automations.yaml
+- alias: "Sync Joplin - User1"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  action:
+    - service: rest_command.joplin_sync_user1
+```
+
 ## [2.2.1] - 2025-12-21
 
 ### Fixed

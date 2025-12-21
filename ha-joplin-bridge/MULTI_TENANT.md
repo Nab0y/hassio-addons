@@ -49,7 +49,6 @@ Version 2.0.0 adds **multi-tenant** mode support, allowing multiple Home Assista
 users:
   - name: "dad"
     sync_target: 9
-    sync_interval: 300  # Auto-sync every 5 minutes
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "dad@family.com"
     sync_password: "password1"
@@ -59,7 +58,6 @@ users:
     
   - name: "mom"
     sync_target: 9
-    sync_interval: 600  # Auto-sync every 10 minutes
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "mom@family.com"
     sync_password: "password2"
@@ -69,7 +67,6 @@ users:
     
   - name: "son"
     sync_target: 9
-    sync_interval: 300  # Auto-sync every 5 minutes
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "son@family.com"
     sync_password: "password3"
@@ -77,33 +74,11 @@ users:
     
   - name: "daughter"
     sync_target: 9
-    # sync_interval not set - uses default 300 seconds (5 minutes)
     sync_server_url: "https://joplin.yourdomain.com"
     sync_username: "daughter@family.com"
     sync_password: "password4"
     locale: "en_US"
 ```
-
-### Automatic Synchronization
-
-Each user can have automatic background synchronization configured via `sync_interval`:
-
-- **Range:** 60-3600 seconds (1 minute to 1 hour)
-- **Default:** 300 seconds (5 minutes) if not specified
-- **Disable:** Set to `0` to disable auto-sync for specific user
-
-```yaml
-users:
-  - name: "user1"
-    sync_interval: 180  # Every 3 minutes
-    # ... other config ...
-    
-  - name: "user2"
-    sync_interval: 0    # Disabled, manual sync only
-    # ... other config ...
-```
-
-Auto-sync runs independently for each user and doesn't block the API.
 
 ### Minimal Configuration
 
@@ -357,28 +332,106 @@ automation:
 
 ## Synchronization
 
-### Manual Sync for Specific User
+**Note:** Automatic synchronization is controlled via Home Assistant automations, not by the addon itself. This gives you full flexibility to trigger sync based on any condition (time, events, sensors, etc.).
+
+### Manual Sync via API
 
 ```bash
-# Sync for Dad
-curl -X POST http://localhost:41186/sync \
+# Sync for Dad (background mode)
+curl -X POST http://192.168.1.42:41186/sync \
   -H "Content-Type: application/json" \
   -d '{"profile": "dad", "background": true}'
 
-# Sync for Mom
-curl -X POST http://localhost:41186/sync \
+# Sync for Mom (foreground - wait for completion)
+curl -X POST http://192.168.1.42:41186/sync \
   -H "Content-Type: application/json" \
   -d '{"profile": "mom", "background": false}'
+```
+
+### Automatic Sync via Home Assistant Automations
+
+Create automations to sync on schedule or events:
+
+```yaml
+# configuration.yaml
+rest_command:
+  joplin_sync_dad:
+    url: "http://192.168.1.42:41186/sync"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    payload: '{"profile": "dad", "background": true}'
+    
+  joplin_sync_mom:
+    url: "http://192.168.1.42:41186/sync"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    payload: '{"profile": "mom", "background": true}'
+
+# automations.yaml
+- alias: "Sync Joplin - Dad - Every 5 minutes"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  action:
+    - service: rest_command.joplin_sync_dad
+
+- alias: "Sync Joplin - Mom - Every 10 minutes"
+  trigger:
+    - platform: time_pattern
+      minutes: "/10"
+  action:
+    - service: rest_command.joplin_sync_mom
+
+- alias: "Sync Joplin - On Note Creation"
+  trigger:
+    - platform: event
+      event_type: joplin_note_created
+  action:
+    - service: rest_command.joplin_sync_{{ trigger.event.data.user }}
+```
+
+### Node-RED Integration
+
+```json
+[
+    {
+        "id": "sync_joplin_5min",
+        "type": "inject",
+        "name": "Every 5 minutes",
+        "props": [],
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "x": 150,
+        "y": 100,
+        "wires": [["http_request_sync"]]
+    },
+    {
+        "id": "http_request_sync",
+        "type": "http request",
+        "name": "Sync Dad",
+        "method": "POST",
+        "url": "http://192.168.1.42:41186/sync",
+        "payload": "{\"profile\":\"dad\",\"background\":true}",
+        "headers": {"Content-Type":"application/json"},
+        "x": 350,
+        "y": 100,
+        "wires": [[]]
+    }
+]
 ```
 
 ### Check Sync Status
 
 ```bash
 # Status for all users
-curl http://localhost:41186/sync/status
+curl http://192.168.1.42:41186/sync/status
 
 # Status for specific user
-curl http://localhost:41186/sync/status?profile=dad
+curl http://192.168.1.42:41186/sync/status?profile=dad
 ```
 
 ## Lovelace Dashboard
