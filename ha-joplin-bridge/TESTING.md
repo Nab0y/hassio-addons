@@ -1,33 +1,8 @@
-# Testing Guide for v2.0.0 Multi-Tenant
+# Testing Guide for v3.0.0 Multi-Tenant
 
 ## Quick Test Plan
 
-### 1. Single-User Mode Test (Legacy)
-
-**Configuration:**
-```yaml
-sync_target: 0
-users: []
-```
-
-**Verification:**
-```bash
-# Health check
-curl http://localhost:41186/health
-# Expected: "mode": "single", "users_count": 1
-
-# Token
-curl http://localhost:41186/token
-# Expected: single token for "default"
-
-# Create note
-TOKEN=$(curl -s http://localhost:41186/token | jq -r '.token')
-curl -X POST "http://localhost:41185/notes?token=$TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Test Note", "body": "Single-user test"}'
-```
-
-### 2. Multi-Tenant Mode Test
+### 1. Multi-Tenant Mode Test
 
 **Configuration:**
 ```yaml
@@ -111,12 +86,12 @@ Expected messages:
 ```
 Multi-user mode detected: 2 users
 Setting up user 1/2: user1
-Configuring Joplin profile: user1 on port 41184
-Starting Joplin server for user1 on localhost:41184
+Configuring Joplin profile: user1 on port 41190
+Starting Joplin server for user1 on localhost:41190
 user1 Joplin PID: XXXX
 Setting up user 2/2: user2
-Configuring Joplin profile: user2 on port 41185
-Starting Joplin server for user2 on localhost:41185
+Configuring Joplin profile: user2 on port 41191
+Starting Joplin server for user2 on localhost:41191
 user2 Joplin PID: YYYY
 Starting Management API server on port 41186
 Starting Joplin Data API Proxy on port 41185

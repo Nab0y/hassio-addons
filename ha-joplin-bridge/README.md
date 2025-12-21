@@ -338,8 +338,9 @@ automation:
 
 ## Links
 
-- 📖 [Full Documentation](DOCS.md) - Complete API reference and examples
+- 📖 [Multi-Tenant Documentation](MULTI_TENANT.md) - Complete guide with examples and API reference
 - 📋 [Changelog](CHANGELOG.md) - Version history
+- 🧪 [Testing Guide](TESTING.md) - How to test the addon
 - 🐛 [Issues](https://github.com/Nab0y/hassio-addons/issues) - Bug reports and feature requests
 - 📚 [Joplin API Docs](https://joplinapp.org/api/references/rest_api/) - Official API reference
 

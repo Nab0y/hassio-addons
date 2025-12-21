@@ -523,33 +523,43 @@ script:
                   body: "{{ states('input_text.joplin_note_body') }}"
 ```
 
-## Migration from Single-User to Multi-Tenant
+## Migration from v2.x to v3.0
 
-If you're already using version 1.x in single-user mode:
+**Breaking Change:** Built-in auto-sync removed in v3.0.
 
-1. **Backup your data** - it's located in `/data/joplin`
-2. **Update configuration** by adding `users` array
+If you're upgrading from v2.x:
+
+1. **Remove `sync_interval`** from user configuration (no longer supported)
+2. **Create HA automations** for sync scheduling (see Synchronization section above)
 3. **Restart addon**
-4. **Update sensors and commands** in Home Assistant
 
-### Backward Compatibility
-
-The addon will continue to work in legacy single-user mode if the `users` array is empty:
-
+Example migration:
 ```yaml
-# Legacy mode (as before)
-sync_target: 9
-sync_server_url: "https://joplin.example.com"
-sync_username: "user@example.com"
-sync_password: "password"
-users: []  # Empty array = legacy mode
+# v2.x (OLD)
+users:
+  - name: "user1"
+    sync_interval: 300  # ❌ No longer works
+    
+# v3.0 (NEW)
+users:
+  - name: "user1"
+    # sync_interval removed
+    
+# Add to automations.yaml instead:
+automation:
+  - alias: "Sync user1 every 5 minutes"
+    trigger:
+      - platform: time_pattern
+        minutes: "/5"
+    action:
+      - service: rest_command.joplin_sync_user1
 ```
 
 ## Limitations
 
-- Maximum 10 users (technically more is possible, but RAM usage increases)
+- Maximum 10 users recommended (more is possible, but RAM usage increases)
 - Each Joplin profile uses ~50-100MB RAM
-- All users must use the same sync type (or no sync)
+- Each user can have different sync target and credentials
 
 ## Troubleshooting
 

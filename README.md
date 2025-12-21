@@ -15,7 +15,7 @@ Custom Home Assistant add-ons developed with AI assistance. Functional, tested, 
 
 ### [HA Joplin Bridge](ha-joplin-bridge/)
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)
 ![Supports aarch64 Architecture](https://img.shields.io/badge/aarch64-yes-green.svg)
 ![Supports amd64 Architecture](https://img.shields.io/badge/amd64-yes-green.svg)
 ![AI Assisted](https://img.shields.io/badge/AI%20assisted-🤖-purple.svg)
@@ -23,14 +23,15 @@ Custom Home Assistant add-ons developed with AI assistance. Functional, tested, 
 Bridge between Home Assistant and Joplin with Web Clipper API support.
 
 **Key Features:**
+- 👥 **Multi-Tenant** - Multiple users, each with their own Joplin account
 - 🌐 **Web Clipper API** - Full Joplin REST API for notes and notebooks
-- 🔄 **Multi-Service Sync** - Joplin Server, Nextcloud, OneDrive, Dropbox, S3
+- 🔄 **Multi-Service Sync** - Joplin Server, Nextcloud, S3
 - 🔧 **Management API** - Sync control, status monitoring, system info  
 - 📝 **HA Integration** - Perfect for automations and event logging
 - 🔒 **Encryption** - Optional end-to-end encryption support
 - 🚀 **Multi-Platform** - Supports aarch64 and amd64 architectures
 
-[📖 Documentation](ha-joplin-bridge/DOCS.md) | [📋 Changelog](ha-joplin-bridge/CHANGELOG.md)
+[📖 Documentation](ha-joplin-bridge/MULTI_TENANT.md) | [📋 Changelog](ha-joplin-bridge/CHANGELOG.md)
 
 ---
 
