@@ -25,7 +25,7 @@ RUN addgroup -g 1000 joplin && \
 
 # Install Joplin CLI
 RUN npm install -g "joplin@${JOPLIN_CLI_VERSION}" && \
-    joplin version
+    npm list -g joplin --depth=0
 
 # Create directories
 RUN mkdir -p /data/joplin
