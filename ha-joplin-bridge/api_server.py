@@ -5,7 +5,7 @@ Multi-Tenant Edition with Smart Token Routing
 """
 
 from flask import Flask, jsonify, request, Response
-import subprocess  # nosec B404 - needed for Joplin CLI commands
+import subprocess  # nosec B404
 import os
 import json
 import threading
@@ -108,7 +108,7 @@ def run_joplin_command(profile_name: str, command: str, args=None, timeout=120) 
         env["HOME"] = profile_dir
         env["JOPLIN_PROFILE"] = f"{profile_dir}/.config/joplin"
 
-        result = subprocess.run(  # nosec B603 - controlled input validation
+        result = subprocess.run(  # nosec B603
             cmd,
             capture_output=True,
             text=True,
@@ -400,7 +400,7 @@ def get_info():
         "sync_target": sync_target,
         "sync_status": sync_status.get(profile_name, {}),
         "api_endpoints": {
-            "token": "/token",
+            "token": "/token",  # nosec B105
             "health": "/health",
             "info": "/info",
             "sync": "/sync (POST)",
@@ -484,12 +484,12 @@ if __name__ == "__main__":
     # Check if port is available
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(("0.0.0.0", port))  # nosec B104 - container networking
+        sock.bind(("0.0.0.0", port))  # nosec B104
         sock.close()
         print(f"Port {port} is available")
     except OSError as e:
         print(f"Port {port} is not available: {e}")
 
-    host = "0.0.0.0"  # nosec B104 - controlled environment
+    host = "0.0.0.0"  # nosec B104
 
     serve(app, host=host, port=port, threads=4)
