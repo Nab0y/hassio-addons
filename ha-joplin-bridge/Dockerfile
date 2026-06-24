@@ -1,6 +1,8 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
+ARG JOPLIN_CLI_VERSION=3.6.2
+
 # Install dependencies
 RUN apk add --no-cache --no-scripts \
     nodejs \
@@ -22,7 +24,8 @@ RUN addgroup -g 1000 joplin && \
     adduser -D -s /bin/bash -u 1000 -G joplin joplin
 
 # Install Joplin CLI
-RUN npm install -g joplin
+RUN npm install -g "joplin@${JOPLIN_CLI_VERSION}" && \
+    joplin version
 
 # Create directories
 RUN mkdir -p /data/joplin

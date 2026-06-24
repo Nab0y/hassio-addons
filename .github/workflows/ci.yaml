@@ -107,5 +107,6 @@ jobs:
             ghcr.io/${{ steps.repo.outputs.owner }}/${{ matrix.architecture }}-addon-ha-joplin-bridge:${{ steps.version.outputs.version }}
           build-args: |
             BUILD_FROM=ghcr.io/home-assistant/${{ matrix.architecture }}-base:latest
+            JOPLIN_CLI_VERSION=3.6.2
           cache-from: type=gha
           cache-to: type=gha,mode=max
